@@ -151,7 +151,6 @@
                             <h2 class="text-xl font-bold text-navy mb-2">Ógildur hlekkur</h2>
                             <p class="text-slate-500 max-w-md text-sm">Þessi söluhlekkur virðist vera gamall eða vitlaus. Vinsamlegast fáðu nýjan hlekk frá seljanda.</p>
                         </div>`;
-                    // Ekki fela loader hér því við höfum þegar skipt út body
                     return;
                 }
 
@@ -186,7 +185,7 @@
                 console.error("Init error:", error);
                 document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-red-500">Villa kom upp. Vinsamlegast reyndu aftur síðar.</div>`;
             } finally {
-                // Öruggt felun á hleðsluskjá
+                // VIÐGERÐ: Athuga hvort element sé til áður en stíl er breytt
                 const loader = document.getElementById('loading-screen');
                 if (loader) loader.style.display = 'none';
             }
@@ -220,7 +219,6 @@
             const qtyEl = document.getElementById(`qty-${id}`);
             if(qtyEl) {
                 qtyEl.innerText = cart[id];
-                // Visual feedback
                 if (change > 0) {
                     qtyEl.parentElement.classList.add('ring-2', 'ring-highlight');
                     setTimeout(() => qtyEl.parentElement.classList.remove('ring-2', 'ring-highlight'), 200);
@@ -265,7 +263,6 @@
             
             if (!name) { showToast('Vantar nafn', 'Vinsamlegast skrifaðu nafnið þitt.'); return; }
 
-            // UI Feedback
             const originalText = btn.innerText;
             btn.innerText = "Augnablik...";
             btn.disabled = true;
@@ -299,7 +296,7 @@
                     items: items,
                     total_sales: totalSales,
                     total_profit: totalProfit,
-                    status: 'Greitt' // Mock status
+                    status: 'Greitt'
                 }]);
 
             if (error) {
@@ -323,8 +320,6 @@
 
         function copyPageLink() {
             const url = window.location.href;
-            
-            // Örugg afritun (Fallback)
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(url).then(() => showToast('', 'Hlekkur afritaður')).catch(err => fallbackCopy(url));
             } else {
