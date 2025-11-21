@@ -40,8 +40,8 @@
         /* A4 Poster Styles */
         .poster-wrapper {
             width: 100%;
-            max-width: 210mm; /* A4 width */
-            aspect-ratio: 210/297; /* A4 ratio */
+            max-width: 210mm; 
+            aspect-ratio: 210/297; 
             background: white;
             margin: 0 auto;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
@@ -71,7 +71,6 @@
             border-top-right-radius: 50% 20px;
         }
 
-        /* Auto-sizing grid for poster items */
         .poster-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -302,15 +301,15 @@
                         <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
                             <h3 class="font-bold text-navy mb-4 text-lg">Stillingar hóps</h3>
                             <div class="mb-4">
-                                <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Nafn hóps</label>
+                                <label class="text-xs font-bold text-slate-400 uppercase block mb-2">Nafn hóps</label>
                                 <input type="text" id="admin-group-name-input" class="w-full p-3 bg-slate-50 rounded-xl border-none font-bold text-navy" readonly>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Lykilorð (Join Code)</label>
-                                    <code class="w-full p-3 bg-slate-50 rounded-xl font-mono text-navy border border-slate-200" id="admin-group-pass">...</code>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Lykilorð (Join Code)</label>
+                                <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
+                                    <code class="font-mono text-navy font-bold text-lg" id="admin-group-pass">...</code>
+                                    <button onclick="deleteGroup()" class="text-red-600 font-bold text-sm hover:underline">Eyða Hóp</button>
                                 </div>
-                                <button onclick="deleteGroup()" class="text-red-600 font-bold text-sm hover:underline mt-4">Eyða Hóp</button>
                             </div>
                         </div>
                     </div>
@@ -517,9 +516,8 @@
                     }
 
                     const cleanGroup = groupName.replace(/\s+/g,'').toLowerCase();
-                    // FIX: USE VERCEL URL (Notkun Vercel URL)
-                    // Ef þú keyrir þetta lokalt mun það nota localhost, en á netinu vercel.app
-                    const baseUrl = window.location.origin; 
+                    // FIX: USE VERCEL URL
+                    const baseUrl = window.location.origin; // Virkar bæði í local og vercel
                     const link = `${baseUrl}/sale.html?group=${currentGroupId}&seller=${currentUser.id}`;
                     
                     safeSetText('personal-link', link);
@@ -786,13 +784,12 @@
             setTimeout(() => toast.classList.add('translate-y-48'), 3000);
         }
         function copyLink() {
-            // Uppfærð afritunar virkni (Robust Copy)
+            // Robust Copy
             const el = document.getElementById('personal-link');
             if (!el) return;
             
             const textToCopy = el.innerText;
 
-            // Reyna nútíma API fyrst
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(textToCopy)
                     .then(() => showToast('Afritað', 'Hlekkur afritaður.'))
@@ -809,7 +806,6 @@
             const textArea = document.createElement("textarea");
             textArea.value = text;
             
-            // Hindra skrollun
             textArea.style.top = "0";
             textArea.style.left = "0";
             textArea.style.position = "fixed";
