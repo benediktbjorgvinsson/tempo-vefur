@@ -99,22 +99,13 @@
         <button onclick="location.reload()" class="text-navy font-bold hover:bg-slate-50 px-8 py-3 rounded-xl border border-slate-200 transition-colors">Loka glugga</button>
     </div>
 
-    <!-- TOAST -->
-    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-navy text-white px-6 py-3 rounded-full shadow-2xl transform -translate-y-24 transition-all duration-500 z-[100]">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-highlight"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        <span id="toast-message" class="text-sm font-bold">Skilaboð</span>
-    </div>
-
     <script>
-        // --- SUPABASE ---
         const SUPABASE_URL = 'https://axwbfnnhbccoqtqaffaj.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4d2Jmbm5oYmNjb3F0cWFmZmFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NTMxOTksImV4cCI6MjA3OTIyOTE5OX0.xEHFqIe8QYT22Yj375LNYqwPkwJA5hrVB6HyPASNobs';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // UTILS
         function cleanId(id) { if(!id) return null; return id.replace(/['"]/g, '').trim(); }
-        function isValidUUID(uuid) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid); }
-
+        
         const urlParams = new URLSearchParams(window.location.search);
         const GROUP_ID = cleanId(urlParams.get('group'));
         const SELLER_ID = cleanId(urlParams.get('seller'));
@@ -124,40 +115,58 @@
         let sellerName = "Seljanda";
 
         async function init() {
-            const loader = document.getElementById('loading-screen');
-            
-            // Öryggistékk
-            if (!SELLER_ID || !isValidUUID(SELLER_ID) || (GROUP_ID && !isValidUUID(GROUP_ID))) {
-                document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-slate-400">Ógildur hlekkur. Vinsamlegast fáðu nýjan hlekk.</div>`;
-                return;
-            }
-
             try {
-                // 1. Sækja seljanda
-                const { data: sellerData } = await supabaseClient.from('sellers').select('selected_products, full_name').eq('user_id', SELLER_ID).single();
-                if (sellerData) {
-                    availableProducts = sellerData.selected_products || [];
-                    sellerName = sellerData.full_name || "Seljanda";
-                    document.getElementById('seller-name-display').innerText = sellerName;
+                // 1. GÖGN SÓTT OG ÖRYGGISTÉKK
+                // Reynum að sækja hópinn fyrst til að sjá hvort hann sé til
+                if (!GROUP_ID) throw new Error("Vantar hóp ID");
+
+                const { data: groupData, error: groupError } = await supabaseClient
+                    .from('groups')
+                    .select('group_name')
+                    .eq('group_id', GROUP_ID)
+                    .single();
+
+                if (groupError || !groupData) {
+                    // EF HÓPUR FINNST EKKI -> SÝNA VILLUSÍÐU
+                    document.body.innerHTML = `
+                        <div class="flex h-screen flex-col items-center justify-center text-center p-8">
+                            <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mb-4 text-2xl font-bold">?</div>
+                            <h2 class="text-xl font-bold text-navy mb-2">Hópur fannst ekki</h2>
+                            <p class="text-slate-500 max-w-md text-sm">Söluhlekkurinn er útrunninn eða ógildur. Vinsamlegast fáðu nýjan hlekk.</p>
+                        </div>`;
+                    return; 
+                }
+                
+                document.getElementById('group-name-display').innerText = groupData.group_name;
+
+                // 2. Sækja vörur seljanda
+                if (SELLER_ID) {
+                    const { data: sellerData } = await supabaseClient
+                        .from('sellers')
+                        .select('selected_products, full_name')
+                        .eq('user_id', SELLER_ID)
+                        .single();
+                    
+                    if (sellerData) {
+                        availableProducts = sellerData.selected_products || [];
+                        sellerName = sellerData.full_name || "Seljanda";
+                        document.getElementById('seller-name-display').innerText = sellerName;
+                    }
                 }
 
-                // 2. Sækja hóp
-                if (GROUP_ID) {
-                    const { data: groupData } = await supabaseClient.from('groups').select('group_name').eq('group_id', GROUP_ID).single();
-                    if (groupData) document.getElementById('group-name-display').innerText = groupData.group_name;
-                }
-
-                if (!availableProducts.length) {
+                if (availableProducts.length === 0) {
                     document.getElementById('products-list').innerHTML = '<div class="text-center py-20 text-slate-400">Engar vörur valdar.</div>';
                 } else {
                     renderProducts();
                 }
 
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
+                document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-red-500">Villa við að hlaða síðu.</div>`;
+            } finally {
+                const loader = document.getElementById('loading-screen');
+                if(loader) loader.style.display = 'none';
             }
-            
-            if(loader) loader.style.display = 'none';
         }
 
         function renderProducts() {
@@ -171,7 +180,8 @@
                         <span class="font-bold text-navy w-6 text-center tabular-nums select-none" id="qty-${p.id}">0</span>
                         <button onclick="updateCart(${p.id}, 1)" class="w-9 h-9 flex items-center justify-center font-bold text-white bg-navy shadow-md rounded-lg hover:bg-opacity-90 active:scale-95 transition-all">+</button>
                     </div>
-                </div>`).join('');
+                </div>
+            `).join('');
         }
 
         function updateCart(id, change) {
@@ -202,9 +212,10 @@
         async function submitOrder() {
             const name = document.getElementById('buyer-name').value;
             const email = document.getElementById('buyer-email').value;
-            if (!name) { showToast('Vantar nafn', 'Skrifaðu nafnið þitt.'); return; }
-
             const btn = document.getElementById('confirm-btn');
+            
+            if (!name) { alert("Vinsamlegast skrifaðu nafn."); return; }
+
             const originalText = btn.innerText;
             btn.innerText = "Augnablik...";
             btn.disabled = true;
@@ -234,24 +245,16 @@
             }]);
 
             if (error) {
-                // Ef villa er vegna foreign key (hópur finnst ekki), þá er það líklegast gamall linkur
-                alert("Villa: Gat ekki vistað pöntun. Hópurinn gæti verið eyddur. (" + error.message + ")");
-                btn.innerText = originalText;
-                btn.disabled = false;
-            } else {
-                closeCheckout();
-                document.getElementById('success-screen').style.display = 'flex';
+                alert("Villa: " + error.message); 
+                btn.innerText = originalText; 
+                btn.disabled = false; 
+            } 
+            else { 
+                closeCheckout(); 
+                document.getElementById('success-screen').style.display = 'flex'; 
             }
         }
 
-        function showToast(title, msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-message').innerText = msg;
-            toast.classList.remove('-translate-y-24');
-            setTimeout(() => toast.classList.add('-translate-y-24'), 3000);
-        }
-        
-        // Start
         init();
     </script>
 </body>
