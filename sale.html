@@ -30,16 +30,11 @@
         
         <!-- HEADER -->
         <div class="text-center mb-10 mt-4 relative">
-            <!-- Share Button -->
-            <button onclick="copyPageLink()" class="absolute right-0 top-0 p-2 text-slate-400 hover:text-navy hover:bg-slate-100 rounded-full transition-colors" title="Deila síðu">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
-            </button>
-
             <div class="w-16 h-16 bg-navy rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg text-highlight font-bold text-2xl shadow-navy/20">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
             </div>
             <h1 class="text-3xl font-bold text-navy mb-2 tracking-tight">Styrktu <span id="group-name-display" class="text-blue-600">...</span></h1>
-            <p class="text-slate-500 font-medium">Veldu vörur hér að neðan til að styðja við okkar verkefni.</p>
+            <p class="text-slate-500 font-medium">Söluaðili: <span id="seller-name-display" class="font-bold text-navy">...</span></p>
         </div>
 
         <!-- PRODUCTS LIST -->
@@ -49,7 +44,7 @@
 
     </div>
 
-    <!-- CART SUMMARY (Sticky Bottom) -->
+    <!-- CART BAR -->
     <div id="cart-bar" class="cart-bar cart-hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40">
         <div class="max-w-2xl mx-auto flex justify-between items-center">
             <div>
@@ -69,9 +64,7 @@
             <button onclick="closeCheckout()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-navy hover:bg-slate-100 rounded-full transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
-
             <h2 class="text-2xl font-bold text-navy mb-6">Ljúka pöntun</h2>
-            
             <div class="space-y-4 mb-8">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Nafn þitt</label>
@@ -82,31 +75,27 @@
                     <input type="email" id="buyer-email" placeholder="jon@email.com" class="w-full p-4 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-highlight text-navy font-medium placeholder:text-slate-400 transition-all">
                 </div>
             </div>
-
-            <div class="bg-slate-50 p-5 rounded-2xl mb-6 border border-slate-100">
+            <div class="bg-slate-50 p-4 rounded-xl mb-6 border border-slate-100">
                 <div class="flex justify-between text-sm mb-2">
                     <span class="text-slate-500">Vörur</span>
                     <span class="font-bold text-navy" id="checkout-count">0 stk</span>
                 </div>
-                <div class="flex justify-between text-lg font-bold border-t border-slate-200 pt-2 mt-2">
+                <div class="flex justify-between text-lg font-bold border-t border-slate-200 pt-2">
                     <span class="text-navy">Samtals</span>
                     <span class="text-navy"><span id="checkout-total">0</span> kr.</span>
                 </div>
             </div>
-
-            <button onclick="submitOrder()" id="confirm-btn" class="w-full py-4 bg-highlight text-navy rounded-xl font-bold hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 text-lg transform active:scale-95">
-                Staðfesta & Greiða
-            </button>
+            <button onclick="submitOrder()" id="confirm-btn" class="w-full py-4 bg-highlight text-navy rounded-xl font-bold hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 text-lg transform active:scale-95">Staðfesta & Greiða</button>
         </div>
     </div>
 
     <!-- SUCCESS SCREEN -->
     <div id="success-screen" class="fixed inset-0 bg-white z-[60] hidden flex-col items-center justify-center text-center p-8 fade-in">
-        <div class="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-8 animate-bounce shadow-lg shadow-green-100">
+        <div class="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-8 animate-bounce">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
         </div>
         <h2 class="text-4xl font-bold text-navy mb-4">Takk fyrir stuðninginn!</h2>
-        <p class="text-slate-500 text-lg mb-12 max-w-md mx-auto">Pöntunin þín hefur verið skráð og kvittun verður send á netfangið þitt.</p>
+        <p class="text-slate-500 text-lg mb-12 max-w-md mx-auto">Pöntunin þín hefur verið skráð.</p>
         <button onclick="location.reload()" class="text-navy font-bold hover:bg-slate-50 px-8 py-3 rounded-xl border border-slate-200 transition-colors">Loka glugga</button>
     </div>
 
@@ -117,195 +106,136 @@
     </div>
 
     <script>
-        // --- SUPABASE CONFIG ---
+        // --- SUPABASE ---
         const SUPABASE_URL = 'https://axwbfnnhbccoqtqaffaj.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4d2Jmbm5oYmNjb3F0cWFmZmFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NTMxOTksImV4cCI6MjA3OTIyOTE5OX0.xEHFqIe8QYT22Yj375LNYqwPkwJA5hrVB6HyPASNobs';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- UTILS ---
-        function isValidUUID(uuid) {
-            const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-            return regex.test(uuid);
-        }
-        function cleanId(id) {
-            if(!id) return null;
-            return id.replace(/['"]/g, '').trim();
-        }
+        // UTILS
+        function cleanId(id) { if(!id) return null; return id.replace(/['"]/g, '').trim(); }
+        function isValidUUID(uuid) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid); }
 
-        // URL PARAMETERS
         const urlParams = new URLSearchParams(window.location.search);
         const GROUP_ID = cleanId(urlParams.get('group'));
         const SELLER_ID = cleanId(urlParams.get('seller'));
 
         let availableProducts = [];
         let cart = {};
+        let sellerName = "Seljanda";
 
-        // --- INIT ---
         async function init() {
             const loader = document.getElementById('loading-screen');
             
-            // Villutékk á hlekk - Ef hlekkur er ógildur, skiptum út body og hættum.
-            // Þá er loader farinn, svo við þurfum ekki að fela hann.
+            // Öryggistékk
             if (!SELLER_ID || !isValidUUID(SELLER_ID) || (GROUP_ID && !isValidUUID(GROUP_ID))) {
-                document.body.innerHTML = `
-                    <div class="flex h-screen flex-col items-center justify-center text-center p-8">
-                        <div class="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-4 text-2xl font-bold shadow-sm">!</div>
-                        <h2 class="text-xl font-bold text-navy mb-2">Ógildur hlekkur</h2>
-                        <p class="text-slate-500 max-w-md text-sm">Þessi söluhlekkur virðist vera gamall eða vitlaus. Vinsamlegast fáðu nýjan hlekk frá seljanda.</p>
-                    </div>`;
+                document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-slate-400">Ógildur hlekkur. Vinsamlegast fáðu nýjan hlekk.</div>`;
                 return;
             }
 
             try {
-                // 1. Sækja vörur seljanda
-                const { data: sellerData, error: sellerError } = await supabaseClient
-                    .from('sellers')
-                    .select('selected_products')
-                    .eq('user_id', SELLER_ID)
-                    .single();
+                // 1. Sækja seljanda
+                const { data: sellerData } = await supabaseClient.from('sellers').select('selected_products, full_name').eq('user_id', SELLER_ID).single();
+                if (sellerData) {
+                    availableProducts = sellerData.selected_products || [];
+                    sellerName = sellerData.full_name || "Seljanda";
+                    document.getElementById('seller-name-display').innerText = sellerName;
+                }
 
-                // 2. Sækja nafn hóps
+                // 2. Sækja hóp
                 if (GROUP_ID) {
-                    const { data: groupData } = await supabaseClient
-                        .from('groups')
-                        .select('group_name')
-                        .eq('group_id', GROUP_ID)
-                        .single();
+                    const { data: groupData } = await supabaseClient.from('groups').select('group_name').eq('group_id', GROUP_ID).single();
                     if (groupData) document.getElementById('group-name-display').innerText = groupData.group_name;
                 }
 
-                // Ef engar vörur fundust
-                if (sellerError || !sellerData || !sellerData.selected_products || sellerData.selected_products.length === 0) {
-                    document.getElementById('products-list').innerHTML = `
-                        <div class="text-center py-20 text-slate-400">
-                            <p>Þessi seljandi hefur ekki valið neinar vörur ennþá.</p>
-                        </div>`;
+                if (!availableProducts.length) {
+                    document.getElementById('products-list').innerHTML = '<div class="text-center py-20 text-slate-400">Engar vörur valdar.</div>';
                 } else {
-                    availableProducts = sellerData.selected_products;
                     renderProducts();
                 }
-                
-                // Fela loader ef allt gekk vel
-                if(loader) loader.style.display = 'none';
 
-            } catch (error) {
-                console.error("Init error:", error);
-                // Ef alvarleg villa, sýna skilaboð
-                document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-red-500">Villa kom upp. Vinsamlegast reyndu aftur síðar.</div>`;
+            } catch(e) {
+                console.error(e);
             }
+            
+            if(loader) loader.style.display = 'none';
         }
 
         function renderProducts() {
             const container = document.getElementById('products-list');
             container.innerHTML = availableProducts.map(p => `
                 <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex gap-5 items-center hover:shadow-md transition-all duration-200 group">
-                    <div class="w-24 h-24 bg-slate-100 rounded-2xl overflow-hidden shrink-0 relative">
-                        <img src="${p.img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="font-bold text-navy text-lg leading-tight mb-1 truncate">${p.name}</h3>
-                        <p class="text-slate-500 font-medium">${p.price.toLocaleString('is-IS')} kr.</p>
-                    </div>
+                    <div class="w-24 h-24 bg-slate-100 rounded-2xl overflow-hidden shrink-0 relative"><img src="${p.img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div>
+                    <div class="flex-1 min-w-0"><h3 class="font-bold text-navy text-lg leading-tight mb-1 truncate">${p.name}</h3><p class="text-slate-500 font-medium">${p.price.toLocaleString('is-IS')} kr.</p></div>
                     <div class="flex items-center gap-3 bg-slate-50 rounded-xl p-1.5 border border-slate-100">
                         <button onclick="updateCart(${p.id}, -1)" class="w-9 h-9 flex items-center justify-center font-bold text-slate-400 hover:text-navy hover:bg-white rounded-lg transition-all">-</button>
                         <span class="font-bold text-navy w-6 text-center tabular-nums select-none" id="qty-${p.id}">0</span>
                         <button onclick="updateCart(${p.id}, 1)" class="w-9 h-9 flex items-center justify-center font-bold text-white bg-navy shadow-md rounded-lg hover:bg-opacity-90 active:scale-95 transition-all">+</button>
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
         }
 
         function updateCart(id, change) {
             if (!cart[id]) cart[id] = 0;
             cart[id] += change;
             if (cart[id] < 0) cart[id] = 0;
-            
-            const qtyEl = document.getElementById(`qty-${id}`);
-            if(qtyEl) {
-                qtyEl.innerText = cart[id];
-                if (change > 0) {
-                    qtyEl.parentElement.classList.add('ring-2', 'ring-highlight');
-                    setTimeout(() => qtyEl.parentElement.classList.remove('ring-2', 'ring-highlight'), 200);
-                }
-            }
+            document.getElementById(`qty-${id}`).innerText = cart[id];
             updateTotal();
         }
 
         function updateTotal() {
-            let total = 0;
-            let count = 0;
+            let total = 0; let count = 0;
             for (const [id, qty] of Object.entries(cart)) {
                 const product = availableProducts.find(p => p.id == id);
-                if (product) {
-                    total += product.price * qty;
-                    count += qty;
-                }
+                if (product) { total += product.price * qty; count += qty; }
             }
-            
             document.getElementById('cart-total').innerText = total.toLocaleString('is-IS');
             document.getElementById('checkout-total').innerText = total.toLocaleString('is-IS');
             document.getElementById('checkout-count').innerText = count + " stk";
-
             const bar = document.getElementById('cart-bar');
-            if (count > 0) {
-                bar.classList.remove('cart-hidden');
-                bar.classList.add('cart-visible');
-            } else {
-                bar.classList.remove('cart-visible');
-                bar.classList.add('cart-hidden');
-            }
+            if (count > 0) { bar.classList.remove('cart-hidden'); bar.classList.add('cart-visible'); } 
+            else { bar.classList.remove('cart-visible'); bar.classList.add('cart-hidden'); }
         }
 
         function openCheckout() { document.getElementById('checkout-modal').style.display = 'flex'; }
         function closeCheckout() { document.getElementById('checkout-modal').style.display = 'none'; }
 
-        // --- SUBMIT ORDER ---
         async function submitOrder() {
             const name = document.getElementById('buyer-name').value;
             const email = document.getElementById('buyer-email').value;
-            const btn = document.getElementById('confirm-btn');
-            
-            if (!name) { showToast('Vantar nafn', 'Vinsamlegast skrifaðu nafnið þitt.'); return; }
+            if (!name) { showToast('Vantar nafn', 'Skrifaðu nafnið þitt.'); return; }
 
+            const btn = document.getElementById('confirm-btn');
             const originalText = btn.innerText;
             btn.innerText = "Augnablik...";
             btn.disabled = true;
 
             const items = [];
-            let totalSales = 0;
-            let totalProfit = 0;
+            let totalSales = 0; let totalProfit = 0;
 
             for (const [id, qty] of Object.entries(cart)) {
                 if (qty > 0) {
                     const product = availableProducts.find(p => p.id == id);
-                    items.push({
-                        product_id: id,
-                        name: product.name,
-                        qty: qty,
-                        price: product.price,
-                        profit: product.profit
-                    });
+                    items.push({ product_id: id, name: product.name, qty: qty, price: product.price, profit: product.profit });
                     totalSales += product.price * qty;
                     totalProfit += product.profit * qty;
                 }
             }
 
-            const { error } = await supabaseClient
-                .from('orders')
-                .insert([{
-                    group_id: GROUP_ID,
-                    seller_id: SELLER_ID,
-                    buyer_name: name,
-                    buyer_email: email,
-                    items: items,
-                    total_sales: totalSales,
-                    total_profit: totalProfit,
-                    status: 'Greitt' // Mock status
-                }]);
+            const { error } = await supabaseClient.from('orders').insert([{
+                group_id: GROUP_ID,
+                seller_id: SELLER_ID,
+                seller_name: sellerName,
+                buyer_name: name,
+                buyer_email: email,
+                items: items,
+                total_sales: totalSales,
+                total_profit: totalProfit,
+                status: 'Greitt'
+            }]);
 
             if (error) {
-                console.error(error);
-                showToast('Villa', 'Gat ekki sent pöntun. Prófaðu aftur.');
+                // Ef villa er vegna foreign key (hópur finnst ekki), þá er það líklegast gamall linkur
+                alert("Villa: Gat ekki vistað pöntun. Hópurinn gæti verið eyddur. (" + error.message + ")");
                 btn.innerText = originalText;
                 btn.disabled = false;
             } else {
@@ -314,34 +244,13 @@
             }
         }
 
-        // --- UTILS ---
         function showToast(title, msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-message').innerText = msg;
             toast.classList.remove('-translate-y-24');
             setTimeout(() => toast.classList.add('-translate-y-24'), 3000);
         }
-
-        function copyPageLink() {
-            const url = window.location.href;
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(url).then(() => showToast('', 'Hlekkur afritaður')).catch(err => fallbackCopy(url));
-            } else {
-                fallbackCopy(url);
-            }
-        }
-
-        function fallbackCopy(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed"; 
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try { document.execCommand('copy'); showToast('', 'Hlekkur afritaður'); } catch (err) { showToast('', 'Gat ekki afritað'); }
-            document.body.removeChild(textArea);
-        }
-
+        
         // Start
         init();
     </script>
