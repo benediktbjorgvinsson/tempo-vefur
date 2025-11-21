@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Styrkja Hóp - TEMPO</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -18,12 +19,22 @@
         .cart-visible { transform: translateY(0); }
     </style>
 </head>
-<body class="min-h-screen pb-32">
+<body class="min-h-screen pb-32 bg-[#F8FAFC]">
+
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-[100] flex items-center justify-center">
+        <div class="w-12 h-12 bg-highlight rounded-xl flex items-center justify-center animate-pulse text-navy font-bold text-xl">T</div>
+    </div>
 
     <div class="max-w-2xl mx-auto p-6 fade-in">
         
         <!-- HEADER -->
-        <div class="text-center mb-10 mt-4">
+        <div class="text-center mb-10 mt-4 relative">
+            <!-- Share Button -->
+            <button onclick="copyPageLink()" class="absolute right-0 top-0 p-2 text-slate-400 hover:text-navy hover:bg-slate-100 rounded-full transition-colors" title="Deila síðu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
+            </button>
+
             <div class="w-16 h-16 bg-navy rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg text-highlight font-bold text-2xl shadow-navy/20">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
             </div>
@@ -33,22 +44,19 @@
 
         <!-- PRODUCTS LIST -->
         <div id="products-list" class="space-y-4">
-            <div class="text-center py-20">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-navy mx-auto mb-4"></div>
-                <p class="text-slate-400">Sæki vörur...</p>
-            </div>
+            <!-- Vörur koma hér -->
         </div>
 
     </div>
 
-    <!-- CART SUMMARY -->
-    <div id="cart-bar" class="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transition-transform duration-300 cart-hidden z-40">
+    <!-- CART SUMMARY (Sticky Bottom) -->
+    <div id="cart-bar" class="cart-bar cart-hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-40">
         <div class="max-w-2xl mx-auto flex justify-between items-center">
             <div>
                 <p class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-0.5">Samtals</p>
                 <p class="text-3xl font-bold text-navy"><span id="cart-total">0</span> kr.</p>
             </div>
-            <button onclick="openCheckout()" class="bg-navy text-white px-8 py-3.5 rounded-xl font-bold hover:bg-opacity-90 transition-all shadow-lg shadow-navy/20 flex items-center gap-2">
+            <button onclick="openCheckout()" class="bg-navy text-white px-8 py-3.5 rounded-xl font-bold hover:bg-opacity-90 transition-all shadow-lg shadow-navy/20 flex items-center gap-2 transform active:scale-95">
                 Klára Pöntun
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </button>
@@ -57,35 +65,36 @@
 
     <!-- CHECKOUT MODAL -->
     <div id="checkout-modal" class="fixed inset-0 bg-navy/60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm fade-in">
-        <div class="bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl transform scale-100 transition-all">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-navy">Ljúka pöntun</h2>
-                <button onclick="closeCheckout()" class="p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-            </div>
+        <div class="bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl transform scale-100 transition-all relative">
+            <button onclick="closeCheckout()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-navy hover:bg-slate-100 rounded-full transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+
+            <h2 class="text-2xl font-bold text-navy mb-6">Ljúka pöntun</h2>
             
             <div class="space-y-4 mb-8">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Nafn þitt</label>
-                    <input type="text" id="buyer-name" placeholder="Jón Jónsson" class="w-full p-4 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-highlight text-navy font-medium placeholder:text-slate-400">
+                    <input type="text" id="buyer-name" placeholder="Jón Jónsson" class="w-full p-4 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-highlight text-navy font-medium placeholder:text-slate-400 transition-all">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Netfang (fyrir kvittun)</label>
-                    <input type="email" id="buyer-email" placeholder="jon@email.com" class="w-full p-4 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-highlight text-navy font-medium placeholder:text-slate-400">
+                    <input type="email" id="buyer-email" placeholder="jon@email.com" class="w-full p-4 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-highlight text-navy font-medium placeholder:text-slate-400 transition-all">
                 </div>
             </div>
 
-            <div class="bg-slate-50 p-4 rounded-xl mb-6 border border-slate-100">
+            <div class="bg-slate-50 p-5 rounded-2xl mb-6 border border-slate-100">
                 <div class="flex justify-between text-sm mb-2">
                     <span class="text-slate-500">Vörur</span>
                     <span class="font-bold text-navy" id="checkout-count">0 stk</span>
                 </div>
-                <div class="flex justify-between text-lg font-bold border-t border-slate-200 pt-2">
+                <div class="flex justify-between text-lg font-bold border-t border-slate-200 pt-2 mt-2">
                     <span class="text-navy">Samtals</span>
                     <span class="text-navy"><span id="checkout-total">0</span> kr.</span>
                 </div>
             </div>
 
-            <button onclick="submitOrder()" id="confirm-btn" class="w-full py-4 bg-highlight text-navy rounded-xl font-bold hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 text-lg">
+            <button onclick="submitOrder()" id="confirm-btn" class="w-full py-4 bg-highlight text-navy rounded-xl font-bold hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 text-lg transform active:scale-95">
                 Staðfesta & Greiða
             </button>
         </div>
@@ -93,27 +102,37 @@
 
     <!-- SUCCESS SCREEN -->
     <div id="success-screen" class="fixed inset-0 bg-white z-[60] hidden flex-col items-center justify-center text-center p-8 fade-in">
-        <div class="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-8 animate-bounce">
+        <div class="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-8 animate-bounce shadow-lg shadow-green-100">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
         </div>
         <h2 class="text-4xl font-bold text-navy mb-4">Takk fyrir stuðninginn!</h2>
-        <p class="text-slate-500 text-lg mb-12 max-w-md mx-auto">Pöntunin þín hefur verið skráð.</p>
-        <button onclick="window.close()" class="text-navy font-bold hover:bg-slate-50 px-8 py-3 rounded-xl border border-slate-200 transition-colors">Loka glugga</button>
+        <p class="text-slate-500 text-lg mb-12 max-w-md mx-auto">Pöntunin þín hefur verið skráð og kvittun verður send á netfangið þitt.</p>
+        <button onclick="location.reload()" class="text-navy font-bold hover:bg-slate-50 px-8 py-3 rounded-xl border border-slate-200 transition-colors">Loka glugga</button>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-navy text-white px-6 py-3 rounded-full shadow-2xl transform -translate-y-24 transition-all duration-500 z-[100]">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-highlight"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <span id="toast-message" class="text-sm font-bold">Skilaboð</span>
     </div>
 
     <script>
+        // --- SUPABASE CONFIG ---
         const SUPABASE_URL = 'https://axwbfnnhbccoqtqaffaj.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4d2Jmbm5oYmNjb3F0cWFmZmFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NTMxOTksImV4cCI6MjA3OTIyOTE5OX0.xEHFqIe8QYT22Yj375LNYqwPkwJA5hrVB6HyPASNobs';
-        
-        // VIÐGERÐ: Endurnefnt í supabaseClient til að forðast árekstur
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Helper til að hreinsa ID og athuga hvort það sé UUID
+        // --- UTILS ---
+        function isValidUUID(uuid) {
+            const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+            return regex.test(uuid);
+        }
         function cleanId(id) {
             if(!id) return null;
             return id.replace(/['"]/g, '').trim();
         }
 
+        // URL PARAMETERS
         const urlParams = new URLSearchParams(window.location.search);
         const GROUP_ID = cleanId(urlParams.get('group'));
         const SELLER_ID = cleanId(urlParams.get('seller'));
@@ -121,59 +140,73 @@
         let availableProducts = [];
         let cart = {};
 
+        // --- INIT ---
         async function init() {
-            if (!SELLER_ID || !GROUP_ID) {
-                document.body.innerHTML = '<div class="flex h-screen items-center justify-center text-slate-400 p-6 text-center">Ógildur hlekkur. Vinsamlegast fáðu nýjan hlekk frá seljanda.</div>';
-                return;
-            }
-
-            // 1. Sækja vörur frá SELJANDA
-            const { data: sellerData, error: sellerError } = await supabaseClient
-                .from('sellers')
-                .select('selected_products')
-                .eq('user_id', SELLER_ID)
-                .single();
-
-            // 2. Sækja nafn hóps
-            if (GROUP_ID) {
-                const { data: groupData } = await supabaseClient
-                    .from('groups')
-                    .select('group_name')
-                    .eq('group_id', GROUP_ID)
-                    .single(); // Ef þetta klikkar er ID líklega vitlaust
-                
-                if (groupData) {
-                    document.getElementById('group-name-display').innerText = groupData.group_name;
-                } else {
-                    document.body.innerHTML = '<div class="flex h-screen items-center justify-center text-slate-400 p-6 text-center">Hópur fannst ekki. Hlekkurinn gæti verið gamall.</div>';
+            try {
+                // Villutékk á hlekk
+                if (!SELLER_ID || !isValidUUID(SELLER_ID) || (GROUP_ID && !isValidUUID(GROUP_ID))) {
+                    document.body.innerHTML = `
+                        <div class="flex h-screen flex-col items-center justify-center text-center p-8">
+                            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-4 text-2xl font-bold shadow-sm">!</div>
+                            <h2 class="text-xl font-bold text-navy mb-2">Ógildur hlekkur</h2>
+                            <p class="text-slate-500 max-w-md text-sm">Þessi söluhlekkur virðist vera gamall eða vitlaus. Vinsamlegast fáðu nýjan hlekk frá seljanda.</p>
+                        </div>`;
+                    // We just replaced the body, so no need to hide loader explicitly here as it's gone
                     return;
                 }
-            }
 
-            if (sellerError || !sellerData || !sellerData.selected_products) {
-                document.getElementById('products-list').innerHTML = '<div class="text-center py-20 text-slate-400">Þessi seljandi hefur ekki valið neinar vörur ennþá.</div>';
-                return;
-            }
+                // 1. Sækja vörur seljanda
+                const { data: sellerData, error: sellerError } = await supabaseClient
+                    .from('sellers')
+                    .select('selected_products')
+                    .eq('user_id', SELLER_ID)
+                    .single();
 
-            availableProducts = sellerData.selected_products;
-            renderProducts();
+                // 2. Sækja nafn hóps
+                if (GROUP_ID) {
+                    const { data: groupData } = await supabaseClient
+                        .from('groups')
+                        .select('group_name')
+                        .eq('group_id', GROUP_ID)
+                        .single();
+                    if (groupData) document.getElementById('group-name-display').innerText = groupData.group_name;
+                }
+
+                // Ef engar vörur fundust
+                if (sellerError || !sellerData || !sellerData.selected_products || sellerData.selected_products.length === 0) {
+                    document.getElementById('products-list').innerHTML = `
+                        <div class="text-center py-20 text-slate-400">
+                            <p>Þessi seljandi hefur ekki valið neinar vörur ennþá.</p>
+                        </div>`;
+                } else {
+                    availableProducts = sellerData.selected_products;
+                    renderProducts();
+                }
+            } catch (error) {
+                console.error("Init error:", error);
+                document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-red-500">Villa kom upp. Vinsamlegast reyndu aftur síðar.</div>`;
+            } finally {
+                // Only try to hide if the element still exists
+                const loader = document.getElementById('loading-screen');
+                if (loader) loader.style.display = 'none';
+            }
         }
 
         function renderProducts() {
             const container = document.getElementById('products-list');
             container.innerHTML = availableProducts.map(p => `
-                <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex gap-5 items-center hover:shadow-md transition-shadow group">
+                <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex gap-5 items-center hover:shadow-md transition-all duration-200 group">
                     <div class="w-24 h-24 bg-slate-100 rounded-2xl overflow-hidden shrink-0 relative">
-                        <img src="${p.img}" class="w-full h-full object-cover">
+                        <img src="${p.img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     </div>
                     <div class="flex-1 min-w-0">
                         <h3 class="font-bold text-navy text-lg leading-tight mb-1 truncate">${p.name}</h3>
                         <p class="text-slate-500 font-medium">${p.price.toLocaleString('is-IS')} kr.</p>
                     </div>
                     <div class="flex items-center gap-3 bg-slate-50 rounded-xl p-1.5 border border-slate-100">
-                        <button onclick="updateCart(${p.id}, -1)" class="w-8 h-8 flex items-center justify-center font-bold text-slate-400 hover:text-navy hover:bg-white rounded-lg transition-all">-</button>
-                        <span class="font-bold text-navy w-6 text-center tabular-nums" id="qty-${p.id}">0</span>
-                        <button onclick="updateCart(${p.id}, 1)" class="w-8 h-8 flex items-center justify-center font-bold text-white bg-navy shadow-md rounded-lg hover:bg-opacity-90 active:scale-95 transition-all">+</button>
+                        <button onclick="updateCart(${p.id}, -1)" class="w-9 h-9 flex items-center justify-center font-bold text-slate-400 hover:text-navy hover:bg-white rounded-lg transition-all">-</button>
+                        <span class="font-bold text-navy w-6 text-center tabular-nums select-none" id="qty-${p.id}">0</span>
+                        <button onclick="updateCart(${p.id}, 1)" class="w-9 h-9 flex items-center justify-center font-bold text-white bg-navy shadow-md rounded-lg hover:bg-opacity-90 active:scale-95 transition-all">+</button>
                     </div>
                 </div>
             `).join('');
@@ -185,7 +218,14 @@
             if (cart[id] < 0) cart[id] = 0;
             
             const qtyEl = document.getElementById(`qty-${id}`);
-            if(qtyEl) qtyEl.innerText = cart[id];
+            if(qtyEl) {
+                qtyEl.innerText = cart[id];
+                // Visual feedback
+                if (change > 0) {
+                    qtyEl.parentElement.classList.add('ring-2', 'ring-highlight');
+                    setTimeout(() => qtyEl.parentElement.classList.remove('ring-2', 'ring-highlight'), 200);
+                }
+            }
             updateTotal();
         }
 
@@ -217,13 +257,15 @@
         function openCheckout() { document.getElementById('checkout-modal').style.display = 'flex'; }
         function closeCheckout() { document.getElementById('checkout-modal').style.display = 'none'; }
 
+        // --- SUBMIT ORDER ---
         async function submitOrder() {
             const name = document.getElementById('buyer-name').value;
             const email = document.getElementById('buyer-email').value;
             const btn = document.getElementById('confirm-btn');
             
-            if (!name) { alert("Vinsamlegast skrifaðu nafn."); return; }
+            if (!name) { showToast('Vantar nafn', 'Vinsamlegast skrifaðu nafnið þitt.'); return; }
 
+            // UI Feedback
             const originalText = btn.innerText;
             btn.innerText = "Augnablik...";
             btn.disabled = true;
@@ -235,7 +277,13 @@
             for (const [id, qty] of Object.entries(cart)) {
                 if (qty > 0) {
                     const product = availableProducts.find(p => p.id == id);
-                    items.push({ product_id: id, name: product.name, qty: qty, price: product.price, profit: product.profit });
+                    items.push({
+                        product_id: id,
+                        name: product.name,
+                        qty: qty,
+                        price: product.price,
+                        profit: product.profit
+                    });
                     totalSales += product.price * qty;
                     totalProfit += product.profit * qty;
                 }
@@ -251,11 +299,12 @@
                     items: items,
                     total_sales: totalSales,
                     total_profit: totalProfit,
-                    status: 'Greitt'
+                    status: 'Greitt' // Mock status
                 }]);
 
             if (error) {
-                alert("Villa kom upp við pöntun: " + error.message);
+                console.error(error);
+                showToast('Villa', 'Gat ekki sent pöntun. Prófaðu aftur.');
                 btn.innerText = originalText;
                 btn.disabled = false;
             } else {
@@ -264,6 +313,37 @@
             }
         }
 
+        // --- UTILS ---
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('-translate-y-24');
+            setTimeout(() => toast.classList.add('-translate-y-24'), 3000);
+        }
+
+        function copyPageLink() {
+            const url = window.location.href;
+            
+            // Örugg afritun (Fallback)
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => showToast('', 'Hlekkur afritaður')).catch(err => fallbackCopy(url));
+            } else {
+                fallbackCopy(url);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed"; 
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try { document.execCommand('copy'); showToast('', 'Hlekkur afritaður'); } catch (err) { showToast('', 'Gat ekki afritað'); }
+            document.body.removeChild(textArea);
+        }
+
+        // Start
         init();
     </script>
 </body>
