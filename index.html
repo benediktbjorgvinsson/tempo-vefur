@@ -1,0 +1,556 @@
+<html lang="is" class="scroll-smooth"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEMPO - Fjáröflun. Endurhugsuð.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #ffffff;
+            color: #0A1C2E;
+        }
+        .bg-navy { background-color: #0A1C2E; }
+        .text-navy { color: #0A1C2E; }
+        .bg-highlight { background-color: #FACC15; }
+        .text-highlight { color: #FACC15; }
+        
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+        .animate-wiggle { animation: wiggle 3s ease-in-out infinite; }
+    </style>
+<link id="all-fonts-link-font-geist" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist">.font-geist { font-family: 'Geist', sans-serif !important; }</style><link id="all-fonts-link-font-roboto" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-roboto">.font-roboto { font-family: 'Roboto', sans-serif !important; }</style><link id="all-fonts-link-font-montserrat" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-montserrat">.font-montserrat { font-family: 'Montserrat', sans-serif !important; }</style><link id="all-fonts-link-font-poppins" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-poppins">.font-poppins { font-family: 'Poppins', sans-serif !important; }</style><link id="all-fonts-link-font-playfair" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;900&amp;display=swap"><style id="all-fonts-style-font-playfair">.font-playfair { font-family: 'Playfair Display', serif !important; }</style><link id="all-fonts-link-font-instrument-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-instrument-serif">.font-instrument-serif { font-family: 'Instrument Serif', serif !important; }</style><link id="all-fonts-link-font-merriweather" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&amp;display=swap"><style id="all-fonts-style-font-merriweather">.font-merriweather { font-family: 'Merriweather', serif !important; }</style><link id="all-fonts-link-font-bricolage" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-bricolage">.font-bricolage { font-family: 'Bricolage Grotesque', sans-serif !important; }</style><link id="all-fonts-link-font-jakarta" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-jakarta">.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif !important; }</style><link id="all-fonts-link-font-manrope" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-manrope">.font-manrope { font-family: 'Manrope', sans-serif !important; }</style><link id="all-fonts-link-font-space-grotesk" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-space-grotesk">.font-space-grotesk { font-family: 'Space Grotesk', sans-serif !important; }</style><link id="all-fonts-link-font-work-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-work-sans">.font-work-sans { font-family: 'Work Sans', sans-serif !important; }</style><link id="all-fonts-link-font-pt-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-pt-serif">.font-pt-serif { font-family: 'PT Serif', serif !important; }</style><link id="all-fonts-link-font-geist-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist-mono">.font-geist-mono { font-family: 'Geist Mono', monospace !important; }</style><link id="all-fonts-link-font-space-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-space-mono">.font-space-mono { font-family: 'Space Mono', monospace !important; }</style><link id="all-fonts-link-font-quicksand" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-quicksand">.font-quicksand { font-family: 'Quicksand', sans-serif !important; }</style><link id="all-fonts-link-font-nunito" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-nunito">.font-nunito { font-family: 'Nunito', sans-serif !important; }</style></head>
+<body class="antialiased selection:bg-[#FACC15] selection:text-[#0A1C2E]">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-[#F3F4F6]/80 backdrop-blur-md border-b border-gray-200/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex h-20 items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-navy rounded-lg flex items-center justify-center">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FACC15" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" class=""></path>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight text-navy">TEMPO</span>
+                </div>
+                
+                <!-- Center Links -->
+                <div class="hidden md:flex space-x-8 text-sm font-medium text-neutral-600">
+                    <a href="/#features" class="hover:text-navy transition-colors">Eiginleikar</a>
+                    <a href="/#how-it-works" class="hover:text-navy transition-colors">Hvernig þetta virkar</a>
+                    <a href="#pricing" class="hover:text-navy transition-colors">Verðskrá</a>
+                </div>
+
+                <!-- Right Actions -->
+                <div class="flex items-center gap-3">
+<a href="login.html" class="hidden sm:block text-navy hover:bg-neutral-100 transition-colors hover:border-neutral-200 text-sm font-medium border-slate-950 border rounded-lg pt-2.5 pr-5 pb-2.5 pl-5">Innskrá</a>                    <a href="#" class="shiny-cta inline-flex items-center justify-center transition-all hover:scale-[1.02] active:scale-[0.98] text-sm font-medium text-slate-50 rounded-lg pt-2.5 pr-5 pb-2.5 pl-5 relative">
+    <style>
+        @property --gradient-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+        @property --gradient-angle-offset { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+        @property --gradient-percent { syntax: "<percentage>"; initial-value: 20%; inherits: false; }
+        @property --gradient-shine { syntax: "<color>"; initial-value: #FACC15; inherits: false; }
+        
+        .shiny-cta {
+            --gradient-angle: 0deg;
+            --gradient-angle-offset: 0deg;
+            --gradient-percent: 20%;
+            --gradient-shine: #FACC15;
+            background: linear-gradient(#0A1C2E, #0A1C2E) padding-box, 
+                        conic-gradient(from calc(var(--gradient-angle) - var(--gradient-angle-offset)), 
+                            transparent 0%, 
+                            #CA8A04 5%, 
+                            var(--gradient-shine) 15%, 
+                            #CA8A04 30%, 
+                            transparent 40%, 
+                            transparent 100%
+                        ) border-box;
+            border: 1.5px solid transparent;
+            box-shadow: inset 0 0 0 1px #0A1C2E, 0 10px 15px -3px rgba(10, 28, 46, 0.2);
+            animation: border-spin 3s linear infinite;
+        }
+        
+        .shiny-cta:hover {
+            box-shadow: inset 0 0 0 1px #0A1C2E, 0 0 25px -5px rgba(250, 204, 21, 0.5);
+        }
+        
+        @keyframes border-spin {
+            to { --gradient-angle: 360deg; }
+        }
+    </style>
+    <span class="relative z-10">Hefja söfnun</span>
+</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section (Paydo Style) -->
+    <section class="pt-32 pb-24 bg-[#F3F4F6] relative overflow-hidden">
+        <!-- Grid Background Pattern -->
+        <div class="absolute top-0 right-0 bottom-0 left-0" style="background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 32px 32px; opacity: 0.5"></div>
+        
+        <div class="sm:px-6 lg:px-8 max-w-7xl z-10 mr-auto ml-auto pr-4 pl-4 relative">
+            <div class="text-center max-w-4xl mx-auto mb-16">
+                <h1 class="md:text-7xl text-navy leading-[1.1] text-5xl font-semibold tracking-tight mb-6">Fjáröflun gerð <br class="hidden md:block"> <span class="inline-block relative">einföld. <svg class="absolute w-full h-3 -bottom-1 left-0 text-highlight opacity-60" viewBox="0 0 200 9" fill="currentColor"><path d="M2.00025 6.99997C25.7522 2.65151 94.3198 -3.27403 197.567 3.49997L198.279 6.99997C94.9636 0.240696 25.3285 6.17162 1.4637 10.4999L2.00025 6.99997Z" class=""></path></svg></span></h1>
+                <p class="md:text-xl leading-relaxed text-lg text-neutral-500 max-w-2xl mr-auto mb-10 ml-auto">TEMPO sér um allt svo líf safnara sé einfaldað. 
+Sjálfvirk söfnun, vefverslun og uppgjör á einum stað.</p>
+                <div class="flex flex-col sm:flex-row gap-4 gap-x-4 gap-y-4 items-center justify-center">
+<a href="signup.html" class="bg-navy text-white px-8 py-3.5 rounded-lg text-sm font-medium hover:bg-neutral-800 transition-all shadow-xl shadow-navy/10 w-full sm:w-auto inline-block text-center">
+    Stofna aðgang
+</a>
+                    </button>
+                    <button class="text-navy hover:bg-neutral-50 transition-colors sm:w-auto text-sm font-medium bg-white w-full border-neutral-200 border rounded-lg pt-3.5 pr-8 pb-3.5 pl-8">
+                        Skoða sýnishorn
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Mockup -->
+            <div class="relative max-w-5xl mx-auto mt-12 animate-float">
+                <!-- Mascot Sitting on Dashboard -->
+                <div class="absolute -top-20 -left-10 md:-left-16 z-20 animate-wiggle">
+                    <svg width="160" height="160" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-2xl">
+                        <circle cx="100" cy="110" r="80" fill="#FACC15" class=""></circle>
+                        <circle cx="100" cy="110" r="80" stroke="#0A1C2E" stroke-width="4" class=""></circle>
+                        <path d="M110 10L90 50H120L80 110L100 70H70L110 10Z" fill="#0A1C2E" stroke="#ffffff" stroke-width="2" class=""></path>
+                        <ellipse cx="70" cy="100" rx="12" ry="15" fill="#0A1C2E" class=""></ellipse>
+                        <circle cx="74" cy="96" r="4" fill="white" class=""></circle>
+                        <ellipse cx="130" cy="100" rx="12" ry="15" fill="#0A1C2E" class=""></ellipse>
+                        <circle cx="134" cy="96" r="4" fill="white"></circle>
+                        <path d="M75 135C75 135 90 150 125 135" stroke="#0A1C2E" stroke-width="5" stroke-linecap="round" class=""></path>
+                        <circle cx="60" cy="120" r="8" fill="#FB923C" fill-opacity="0.3" class=""></circle>
+                        <circle cx="140" cy="120" r="8" fill="#FB923C" fill-opacity="0.3" class=""></circle>
+                    </svg>
+                    <!-- Speech Bubble -->
+                    <div class="absolute -top-2 right-0 bg-white px-4 py-2 rounded-xl rounded-bl-none border border-neutral-200 shadow-lg transform rotate-6">
+                        <p class="text-xs font-bold text-navy">Hæ, ég er Turbo!</p>
+                    </div>
+                </div>
+
+                <!-- The Dashboard Interface -->
+                <div class="overflow-hidden grid grid-cols-1 md:grid-cols-[240px_1fr] bg-white border-neutral-200 border rounded-xl shadow-2xl">
+                    <!-- Sidebar -->
+                    <div class="hidden md:flex flex-col h-[500px] pt-6 pr-6 pb-6 pl-6 justify-between">
+                        <div class="">
+                            <div class="flex items-center gap-2 text-highlight mb-10">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="zap" class="lucide lucide-zap fill-current w-[20px] h-[20px]" data-icon-replaced="true" style="color: rgb(250, 204, 21); width: 20px; height: 20px;"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path></svg><span class="font-bold text-right">            Stjórnborð</span>
+                                
+                            </div>
+                            <div class="space-y-1">
+                                <div class="bg-highlight text-navy px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="layout-dashboard" class="lucide lucide-layout-dashboard w-4 h-4"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>
+                                    Yfirlit
+                                </div>
+                                <div class="flex hover:text-white hover:bg-white/5 transition-colors cursor-pointer text-sm font-medium text-gray-400 rounded-lg pt-2.5 pr-4 pb-2.5 pl-4 gap-x-3 gap-y-3 items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="users" class="lucide lucide-users w-4 h-4"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                                    Þátttakendur
+                                </div>
+                                <div class="text-gray-400 px-4 py-2.5 rounded-lg text-sm font-medium flex items-center gap-3 hover:text-white hover:bg-white/5 transition-colors cursor-pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shopping-bag" class="lucide lucide-shopping-bag w-4 h-4"><path d="M16 10a4 4 0 0 1-8 0"></path><path d="M3.103 6.034h17.794"></path><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"></path></svg>
+                                    Pantanir
+                                </div>
+                                <div class="text-gray-400 px-4 py-2.5 rounded-lg text-sm font-medium flex items-center gap-3 hover:text-white hover:bg-white/5 transition-colors cursor-pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="wallet" class="lucide lucide-wallet w-4 h-4"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg>
+                                    Uppgjör
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-gray-500 text-xs">
+                            <p>4. Flokkur KA</p>
+                            <p class="">Barcelona 2026</p>
+                        </div>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div class="p-6 md:p-8 bg-white">
+                        <!-- Header -->
+                        <div class="flex justify-between items-center mb-8">
+                            <div class="">
+                                <h3 class="text-2xl font-semibold text-navy">Yfirlit Söfnunar</h3>
+                                <p class="text-sm text-neutral-400">Uppfært í dag, 14:30</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center border border-neutral-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="bell" class="lucide lucide-bell w-4 h-4 text-neutral-500"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path></svg>
+                                </div>
+                                <div class="flex items-center gap-2 px-3 py-1.5 bg-neutral-50 rounded-full border border-neutral-200">
+                                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-highlight to-orange-300"></div>
+                                    <span class="text-sm font-medium text-navy">Jón Jónsson</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="chevron-down" class="lucide lucide-chevron-down w-[12px] h-[12px]" data-icon-replaced="true" style="width: 12px; height: 12px; color: rgb(163, 163, 163);"><path d="m6 9 6 6 6-6"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats Row -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                            <div class="p-0">
+                                <p class="text-sm text-neutral-500 mb-1">Safnað í heild</p>
+                                <div class="flex items-end gap-2">
+                                    <span class="text-3xl font-bold text-navy tracking-tight">2.450.000</span>
+                                    <span class="text-sm text-neutral-400 mb-1">kr.</span>
+                                </div>
+                                <div class="text-xs text-green-600 mt-1 flex items-center font-medium">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trending-up" class="lucide lucide-trending-up w-3 h-3 mr-1"><path d="M16 7h6v6"></path><path d="m22 7-8.5 8.5-5-5L2 17"></path></svg>
+                                    +125.000 í dag
+                                </div>
+                            </div>
+                            <div class="p-0 border-l pl-6 border-neutral-100">
+                                <p class="text-sm text-neutral-500 mb-1">Vörur seldar</p>
+                                <div class="flex items-end gap-2">
+                                    <span class="text-3xl font-bold text-navy tracking-tight">482</span>
+                                    <span class="text-sm text-neutral-400 mb-1">stk</span>
+                                </div>
+                                <div class="text-xs text-neutral-400 mt-1">
+                                    Markmið: 1000 stk
+                                </div>
+                            </div>
+                            <div class="p-0 border-l pl-6 border-neutral-100">
+                                <p class="text-sm text-neutral-500 mb-1">Þátttakendur</p>
+                                <div class="flex items-end gap-2">
+                                    <span class="text-3xl font-bold text-navy tracking-tight">24</span>
+                                    <span class="text-sm text-neutral-400 mb-1">virkir</span>
+                                </div>
+                                <div class="text-xs text-neutral-400 mt-1">
+                                    100% virkni
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Graph Area -->
+                        <div class="w-full h-48 bg-neutral-50 rounded-xl border border-neutral-100 relative overflow-hidden p-4 flex items-end gap-2">
+                            <!-- Fake Bars -->
+                            <div class="w-full bg-neutral-200 rounded-t-sm h-[40%] hover:bg-highlight transition-colors"></div>
+                            <div class="w-full bg-neutral-200 rounded-t-sm h-[60%] hover:bg-highlight transition-colors"></div>
+                            <div class="w-full bg-neutral-200 rounded-t-sm h-[30%] hover:bg-highlight transition-colors"></div>
+                            <div class="w-full bg-neutral-200 rounded-t-sm h-[70%] hover:bg-highlight transition-colors"></div>
+                            <div class="w-full bg-neutral-200 rounded-t-sm h-[50%] hover:bg-highlight transition-colors"></div>
+                            <div class="w-full bg-navy rounded-t-sm h-[85%] relative group cursor-pointer">
+                                <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-navy text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                    Metdagur!
+                                </div>
+                            </div>
+                            <div class="w-full bg-neutral-200 rounded-t-sm h-[45%] hover:bg-highlight transition-colors"></div>
+                        </div>
+                        
+                        <!-- Recent Activity List -->
+                         <div class="mt-6 space-y-3">
+                            <div class="flex items-center justify-between p-3 hover:bg-neutral-50 rounded-lg transition-colors cursor-pointer group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold group-hover:scale-110 transition-transform">SJ</div>
+                                    <div>
+                                        <p class="text-xs font-semibold text-navy">Sigga Jóns</p>
+                                        <p class="text-[10px] text-neutral-400">Skoðaði pöntun #1234</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded">+15.000 kr</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 hover:bg-neutral-50 rounded-lg transition-colors cursor-pointer group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-xs font-bold group-hover:scale-110 transition-transform">GA</div>
+                                    <div class="">
+                                        <p class="text-xs font-semibold text-navy">Gunnar A.</p>
+                                        <p class="text-[10px] text-neutral-400">Skráði sig í kerfið</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-medium text-neutral-400">Nýr</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="bg-white pt-24 pb-24" id="features">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-12">
+                <!-- Feature 1 -->
+                <div class="group">
+                    <div class="w-14 h-14 rounded-2xl bg-[#d1f366] bg-opacity-20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="zap" class="lucide lucide-zap w-6 h-6 text-[#8CAD06]"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-navy mb-3">Eldsnögg uppsetning</h3>
+                    <p class="text-neutral-500 text-sm leading-relaxed mb-4">
+                        Þú þarft enga tæknikunnáttu. Stofnaðu söfnun, veldu vörur og byrjaðu að safna á innan við 5 mínútum.
+                    </p>
+                    <a href="#" class="text-sm font-semibold text-navy flex items-center gap-1 hover:gap-2 transition-all">
+<a href="meira-info.html" class="flex items-center gap-2 text-navy hover:underline">
+  Lesa meira
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" class="lucide lucide-arrow-right w-4 h-4"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+</a>
+                    </a>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="group">
+                    <div class="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="bar-chart-3" class="lucide lucide-bar-chart-3 w-6 h-6 text-purple-600"><path d="M3 3v16a2 2 0 0 0 2 2h16"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-navy mb-3">Rauntíma yfirlit</h3>
+                    <p class="text-neutral-500 text-sm leading-relaxed mb-4">
+                        Slepptu Excel skjölunum. Sjáðu nákvæmlega hver hefur selt hvað og hversu mikið er komið í kassann.
+                    </p>
+                    <a href="#" class="text-sm font-semibold text-navy flex items-center gap-1 hover:gap-2 transition-all">
+                        Skoða yfirlit <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" class="lucide lucide-arrow-right w-4 h-4"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                    </a>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="group">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="credit-card" class="lucide lucide-credit-card w-6 h-6 text-blue-600"><rect width="20" height="14" x="2" y="5" rx="2"></rect><line x1="2" x2="22" y1="10" y2="10"></line></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-navy mb-3">Sjálfvirkar greiðslur</h3>
+                    <p class="text-neutral-500 text-sm leading-relaxed mb-4">
+                        Við sjáum um greiðslurnar. Engin eltingarleikur við peninga. Hagnaðurinn fer beint inn á reikning félagsins.
+                    </p>
+                    <a href="#" class="text-sm font-semibold text-navy flex items-center gap-1 hover:gap-2 transition-all">
+                        Læra meira <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" class="lucide lucide-arrow-right w-4 h-4"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dark Feature Section (Reference Style) -->
+    <section class="overflow-hidden bg-slate-800 pt-24 pb-24 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-20 items-center">
+                
+                <!-- Left Visual -->
+                <div class="relative">
+                    <!-- Card Element -->
+                    <div class="bg-neutral-800/50 backdrop-blur-sm p-8 rounded-2xl border border-white/10 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-highlight opacity-20 blur-[60px] rounded-full"></div>
+                        
+                        <!-- Image/Content Mockup -->
+                        <div class="bg-white rounded-xl p-4 shadow-lg transform transition-transform group-hover:scale-[1.02] duration-500">
+                            <div class="flex items-center gap-3 mb-4 border-b pb-3 border-neutral-100">
+                                <div class="w-8 h-8 bg-highlight rounded-full flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="smile" class="lucide lucide-smile w-5 h-5 text-navy"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" x2="9.01" y1="9" y2="9"></line><line x1="15" x2="15.01" y1="9" y2="9"></line></svg>
+                                </div>
+                                <div>
+                                    <div class="h-2 w-24 bg-neutral-200 rounded mb-1"></div>
+                                    <div class="h-2 w-16 bg-neutral-100 rounded"></div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-neutral-50 p-3 rounded-lg">
+                                    <div class="w-full h-24 bg-neutral-200 rounded mb-2"></div>
+                                    <div class="h-2 w-12 bg-neutral-300 rounded"></div>
+                                </div>
+                                <div class="bg-neutral-50 p-3 rounded-lg">
+                                    <div class="w-full h-24 bg-neutral-200 rounded mb-2"></div>
+                                    <div class="h-2 w-12 bg-neutral-300 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating Badge -->
+                        <div class="flex gap-3 animate-float text-sm font-medium text-slate-950 bg-white/10 border-white/20 border rounded-lg pt-3 pr-4 pb-3 pl-4 absolute right-6 bottom-6 backdrop-blur-md gap-x-3 gap-y-3 items-center" style="animation-delay: 1s">
+                            <div class="w-2 h-2 rounded-full bg-highlight animate-pulse"></div>
+                            Vefverslun virk
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Content -->
+                <div class="text-white">
+                    <h2 class="text-4xl lg:text-5xl font-semibold tracking-tight mb-6 leading-[1.1]">
+                        Turbo sér um 
+                        <span class="text-highlight">leiðinlegu verkin.</span>
+                    </h2>
+                    <p class="text-neutral-400 text-lg mb-10 leading-relaxed">
+                        Með TEMPO fær hver þátttakandi sitt eigið sölusvæði. Turbo heldur utan um tölurnar, sendir kvittanir og skilar hagnaðinum. Þú sleppur við stressið.
+                    </p>
+
+                    <div class="grid sm:grid-cols-2 gap-8">
+                        <div class="space-y-3">
+                            <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="smartphone" class="lucide lucide-smartphone w-5 h-5 text-highlight"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect><path d="M12 18h.01"></path></svg>
+                            </div>
+                            <h4 class="font-semibold text-lg">Sérsniðin sölusíða</h4>
+                            <p class="text-sm text-neutral-400 leading-relaxed">Hver nemandi fær sinn eigin hlekk til að deila á samfélagsmiðlum.</p>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shield-check" class="lucide lucide-shield-check w-5 h-5 text-highlight"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                            </div>
+                            <h4 class="font-semibold text-lg">Örugg greiðslugátt</h4>
+                            <p class="text-sm text-neutral-400 leading-relaxed">Fullkomið öryggi í gegnum viðurkenndar íslenskar greiðslugáttir.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Feature Grid (Enhance Experience) -->
+    <section class="py-24 bg-neutral-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-12 gap-12">
+                <!-- Intro Text -->
+                <div class="lg:col-span-4">
+                    <h2 class="text-3xl font-semibold text-navy tracking-tight mb-6">
+                        Eiginleikar sem tryggja  árangur hópsins
+                    </h2>
+                    <p class="leading-relaxed text-sm text-neutral-500 mb-8">Við höfum þróað kerfið í samstarfi við tugi skóla og íþróttafélaga til að tryggja að það leysi raunveruleg vandamál.</p>
+                    <button class="text-navy hover:bg-[#c2e555] transition-colors inline-flex text-sm font-semibold bg-yellow-300 rounded-lg px-6 py-3 gap-x-2 gap-y-2 items-center">
+                        Skoða alla eiginleika <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" class="lucide lucide-arrow-right w-4 h-4"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                    </button>
+                </div>
+
+                <!-- Grid Cards -->
+                <div class="lg:col-span-8 grid sm:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-neutral-100 hover:shadow-lg transition-shadow duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trophy" class="lucide lucide-trophy w-6 h-6 text-navy mb-4"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"></path><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"></path><path d="M18 9h1.5a1 1 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"></path><path d="M6 9H4.5a1 1 0 0 1 0-5H6"></path></svg>
+                        <h4 class="font-semibold text-navy mb-2">Keppnisstemning</h4>
+                        <p class="text-sm text-neutral-500">Skemmtileg stigatafla hvetur hópinn áfram í söfnuninni.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-neutral-100 hover:shadow-lg transition-shadow duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="package" class="lucide lucide-package w-6 h-6 text-navy mb-4"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path><path d="M12 22V12"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><path d="m7.5 4.27 9 5.15"></path></svg>
+                        <h4 class="font-semibold text-navy mb-2">Pakkalitir</h4>
+                        <p class="text-sm text-neutral-500">Auðvelt að flokka vörur eftir litum þegar afhending fer fram.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-neutral-100 hover:shadow-lg transition-shadow duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="share-2" class="lucide lucide-share-2 w-6 h-6 text-navy mb-4"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"></line></svg>
+                        <h4 class="font-semibold text-navy mb-2">Deiling</h4>
+                        <p class="text-sm text-neutral-500">Tilbúið efni til að deila á Facebook og Instagram með einum smelli.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-neutral-100 hover:shadow-lg transition-shadow duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="headphones" class="lucide lucide-headphones w-6 h-6 text-navy mb-4"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"></path></svg>
+                        <h4 class="font-semibold text-navy mb-2">Íslensk þjónusta</h4>
+                        <p class="text-sm text-neutral-500">Við svörum strax ef eitthvað kemur upp á. Engin biðröð.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Cards (Reference Bottom Section) -->
+    <section class="bg-neutral-50 pt-12 pb-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-10 flex justify-between items-end">
+                <h2 class="text-3xl font-semibold text-navy tracking-tight">
+                    Tölur sem tala sínu máli
+                </h2>
+                <div class="flex gap-2">
+                    <button class="p-2 rounded-full border bg-white text-neutral-400 hover:text-navy transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-left" class="lucide lucide-arrow-left w-4 h-4"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></button>
+                    <button class="p-2 rounded-full border bg-white text-neutral-400 hover:text-navy transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" class="lucide lucide-arrow-right w-4 h-4"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></button>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Card 1: Dark -->
+                <div class="bg-navy rounded-2xl p-8 text-white flex flex-col justify-between min-h-[240px] relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 w-32 h-32 bg-white/5 rounded-bl-full transition-transform group-hover:scale-110 origin-top-right"></div>
+                    <div class="">
+                        <h3 class="text-5xl font-bold text-highlight mb-4">200+</h3>
+                        <p class="font-medium text-lg">Skólar og félög</p>
+                    </div>
+                    <div class="mt-8 inline-flex items-center text-sm text-white/60 border border-white/20 rounded-full px-3 py-1 w-fit">
+                        Traust val
+                    </div>
+                </div>
+
+                <!-- Card 2: Light/Accent -->
+                <div class="bg-[#F3F4F6] rounded-2xl p-8 text-navy flex flex-col justify-between min-h-[240px]">
+                    <div class="">
+                        <h3 class="text-5xl font-bold tracking-tight mb-4">50.000.000</h3>
+                        <p class="font-medium text-lg text-neutral-600">Krónur safnaðar</p>
+                    </div>
+                    <div class="mt-8">
+                        <p class="leading-tight text-sm text-neutral-500">Fjárhæð sem hefur runnið beint til safnara TEMPO. </p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Grey/Action -->
+                <div class="bg-[#9CA3AF] rounded-2xl p-8 text-white flex flex-col justify-between min-h-[240px] relative overflow-hidden">
+                    <div class="bg-yellow-400/80 absolute top-0 right-0 bottom-0 left-0"></div>
+                    <div class="relative z-10">
+                        <h3 class="text-5xl font-bold text-slate-800 mb-4">100%</h3>
+                        <p class="font-medium text-lg">Ánægja</p>
+                    </div>
+                    <div class="relative z-10 mt-8 flex justify-between items-end">
+                        <p class="text-sm text-white/80 max-w-[60%]">Engin falin gjöld. Engin binding.</p>
+                        <button class="bg-white text-navy px-4 py-2 rounded-lg text-xs font-bold hover:bg-neutral-100 transition-colors">
+                            Prófa núna
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white border-neutral-100 border-t pt-16 pb-8">
+        <div class="sm:px-6 lg:px-8 max-w-7xl mr-auto ml-auto pr-4 pl-4">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
+                <div class="col-span-2 md:col-span-2">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="w-6 h-6 bg-navy rounded flex items-center justify-center">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FACC15" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-lg font-bold tracking-tight text-navy">TEMPO</span>
+                    </div>
+                    <p class="text-sm text-neutral-500 max-w-xs mb-6">Við gerum fjáröflun einfalda og skemmtilega.</p>
+                </div>
+                <div class="">
+                    <h4 class="text-navy text-sm font-semibold mb-4">Þjónustan</h4>
+                    <ul class="space-y-3 text-sm text-neutral-500">
+                        <li class=""><a href="#" class="hover:text-navy transition-colors">Eiginleikar</a></li>
+                        <li class=""><a href="/#" class="hover:text-navy transition-colors">Verðskrá</a></li>
+                        <li class=""><a href="#" class="hover:text-navy transition-colors">Öryggi</a></li>
+                    </ul>
+                </div>
+                <div class="">
+                    <h4 class="font-semibold text-navy mb-4 text-sm">Fyrirtækið</h4>
+                    <ul class="space-y-3 text-sm text-neutral-500">
+                        <li class=""><a href="#" class="hover:text-navy transition-colors">Um okkur</a></li>
+                        <li class=""><a href="#" class="hover:text-navy transition-colors">Störf</a></li>
+                        <li class=""><a href="#" class="hover:text-navy transition-colors">Hafa samband</a></li>
+                    </ul>
+                </div>
+                <div class="">
+                    <h4 class="font-semibold text-navy mb-4 text-sm">Löglegt</h4>
+                    <ul class="space-y-3 text-sm text-neutral-500">
+                        <li class=""><a href="#" class="hover:text-navy transition-colors">Skilmálar</a></li>
+                        <li class=""><a href="#" class="hover:text-navy transition-colors">Persónuvernd</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-neutral-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-xs text-neutral-400">© 2025 TEMPO ehf. Allur réttur áskilinn.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="text-neutral-400 hover:text-navy transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="facebook" class="lucide lucide-facebook w-4 h-4"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+                    <a href="#" class="text-neutral-400 hover:text-navy transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="twitter" class="lucide lucide-twitter w-4 h-4"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg></a>
+                    <a href="#" class="text-neutral-400 hover:text-navy transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="instagram" class="lucide lucide-instagram w-[16px] h-[16px]" data-icon-replaced="true" style="color: rgb(163, 163, 163); width: 16px; height: 16px"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body></html>

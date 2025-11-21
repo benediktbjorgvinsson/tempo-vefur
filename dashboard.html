@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEMPO - Stjórnborð</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FFFFFF; color: #0F172A; }
+        
+        /* TEMPO Litir */
+        .text-navy { color: #0A1C2E; }
+        .bg-navy { background-color: #0A1C2E; }
+        .bg-highlight { background-color: #FACC15; }
+        .text-highlight { color: #FACC15; }
+        
+        /* Sidebar */
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; font-weight: 500; color: #64748B; transition: all 0.2s ease; width: 100%; text-align: left; margin-bottom: 4px; cursor: pointer; }
+        .nav-item:hover { background-color: #F8FAFC; color: #0A1C2E; }
+        .nav-item.active { background-color: #FACC15; color: #0A1C2E; font-weight: 700; box-shadow: 0 2px 4px rgba(250, 204, 21, 0.2); }
+
+        /* Cards */
+        .product-card { transition: all 0.2s; border: 1px solid #E2E8F0; }
+        .product-card.selected { border-color: #FACC15; background-color: #FFFBEB; box-shadow: 0 4px 6px -1px rgba(250, 204, 21, 0.3); }
+        .product-card.selected .check-icon { opacity: 1; transform: scale(1); }
+
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .modal-overlay { display: none; background-color: rgba(10, 28, 46, 0.8); backdrop-filter: blur(4px); }
+        .modal-overlay.active { display: flex; }
+
+        /* Pimp my Poster Styles */
+        .poster-container {
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .poster-header {
+            background: #0A1C2E;
+            color: white;
+            padding: 2rem;
+            position: relative;
+        }
+        .poster-header::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: white;
+            border-top-left-radius: 50% 20px;
+            border-top-right-radius: 50% 20px;
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden bg-white">
+
+    <!-- LOADING -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-[100] flex items-center justify-center transition-opacity duration-500">
+        <div class="w-12 h-12 bg-highlight rounded-xl flex items-center justify-center animate-pulse text-navy font-bold text-xl">T</div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="hidden md:flex w-64 flex-col bg-white h-full z-20 border-r border-slate-100 shrink-0 p-6">
+        <div class="flex items-center gap-3 mb-10 px-2">
+            <div class="w-8 h-8 bg-navy rounded-lg flex items-center justify-center text-highlight font-bold text-lg shadow-sm">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+            </div>
+            <span class="text-xl font-bold text-navy tracking-tight">TEMPO</span>
+        </div>
+
+        <nav class="flex-1 space-y-1">
+            <button onclick="switchView('overview')" id="nav-overview" class="nav-item active">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Yfirlit
+            </button>
+            <button onclick="switchView('products')" id="nav-products" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.91 8.84 8.56 2.23a1.93 1.93 0 0 0-1.81 0L3.1 4.13a2.12 2.12 0 0 0-.05 3.69l12.22 6.93a2 2 0 0 0 1.94 0L21 12.51a2.12 2.12 0 0 0-.09-3.67Z"/><path d="m7 6 5.44 3.13"/><path d="M5.45 11.55 2 13.36a2.12 2.12 0 0 0-.09 3.68l3.65 1.95a1.93 1.93 0 0 0 1.81 0l3.6-1.9a1.93 1.93 0 0 0 .93-1.73V9.83"/><path d="M11.5 15 20.4 19.8a2.12 2.12 0 0 0 3.6-1.9l-3.65-1.95a1.93 1.93 0 0 0-1.81 0L15 18"/></svg>
+                Vöruúrval
+            </button>
+            <button onclick="switchView('my-products')" id="nav-my-products" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Mínar vörur
+            </button>
+            <button onclick="switchView('orders')" id="nav-orders" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                Pantanir
+            </button>
+
+            <div id="admin-section" class="hidden mt-8 pt-4 border-t border-slate-100">
+                <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Stjórnun</p>
+                <button onclick="switchView('admin')" id="nav-admin" class="nav-item text-navy bg-slate-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Stjórnandi Hóps
+                </button>
+            </div>
+        </nav>
+
+        <div class="mt-auto pt-6 border-t border-slate-100">
+             <!-- Leave Group Button -->
+             <button id="leave-group-btn" onclick="leaveGroup()" class="hidden flex items-center gap-2 text-xs text-slate-400 hover:text-navy transition-colors font-medium w-full mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                Yfirgefa hóp
+            </button>
+
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-xs text-navy" id="sidebar-avatar">--</div>
+                <div class="overflow-hidden">
+                    <p class="text-xs font-bold text-navy truncate" id="footer-user-name">...</p>
+                    <p class="text-[10px] text-slate-400 truncate" id="footer-group-name">...</p>
+                </div>
+            </div>
+             <button id="logout-btn-sidebar" class="flex items-center gap-2 text-xs text-slate-400 hover:text-red-500 transition-colors font-medium w-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                Skrá út
+            </button>
+        </div>
+    </aside>
+
+    <!-- AÐAL EFNI -->
+    <main class="flex-1 flex flex-col overflow-hidden relative bg-white">
+        
+        <!-- Header -->
+        <div class="h-20 flex items-center justify-between px-8 md:px-12 shrink-0 z-10">
+            <div class="md:hidden font-bold text-navy text-lg">TEMPO</div>
+            <div class="hidden md:block"></div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3 pl-4 border-l border-slate-100">
+                    <p class="text-sm font-bold text-navy hidden sm:block" id="top-user-name">...</p>
+                    <div class="w-8 h-8 bg-navy text-white rounded-full flex items-center justify-center font-bold text-sm" id="top-avatar">NN</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCROLLABLE CONTENT -->
+        <div class="flex-1 overflow-y-auto px-6 md:px-12 py-8 bg-white">
+            <div class="max-w-6xl mx-auto pb-20">
+                
+                <!-- 1. YFIRLIT -->
+                <div id="view-overview" class="fade-in space-y-10">
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-bold text-navy mb-2">Yfirlit Söfnunar</h1>
+                        <p class="text-slate-400">Hér sérðu rauntíma stöðu á söfnuninni þinni.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 border-b border-slate-100 pb-12">
+                        <div class="pl-4 border-l-4 border-navy">
+                            <p class="text-slate-500 text-sm mb-2">Safnað í heild</p>
+                            <p class="text-4xl md:text-5xl font-bold text-navy mb-1 tracking-tight"><span id="stat-total-sales">0</span> <span class="text-2xl text-slate-400 font-normal">kr.</span></p>
+                        </div>
+                        <div class="pl-4 border-l-4 border-slate-200">
+                            <p class="text-slate-500 text-sm mb-2">Pantanir</p>
+                            <p class="text-4xl md:text-5xl font-bold text-navy mb-1 tracking-tight"><span id="stat-total-orders">0</span> <span class="text-2xl text-slate-400 font-normal">stk</span></p>
+                        </div>
+                         <div class="pl-4 border-l-4 border-slate-200">
+                            <p class="text-slate-500 text-sm mb-2">Þinn hagnaður</p>
+                            <p class="text-4xl md:text-5xl font-bold text-highlight mb-1 tracking-tight"><span id="stat-total-profit">0</span> <span class="text-2xl text-navy font-normal">kr.</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Link & Empty State -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-bold text-navy mb-4">Söluhlekkur</h3>
+                            <div class="bg-navy text-white p-6 rounded-2xl shadow-lg">
+                                <p class="text-xs text-blue-200 uppercase font-bold mb-2">Sendu þennan hlekk</p>
+                                <div class="flex gap-2">
+                                    <code class="flex-1 bg-black/20 p-2 rounded text-sm font-mono truncate" id="personal-link">...</code>
+                                    <button onclick="copyLink()" class="bg-highlight text-navy px-3 py-1 rounded font-bold text-sm hover:bg-yellow-300">Afrita</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 rounded-2xl p-8 flex flex-col items-center justify-center text-center border border-slate-100">
+                            <div id="empty-graph-state">
+                                <h3 class="text-lg font-bold text-navy mb-1">Engar sölur komnar</h3>
+                                <p class="text-slate-500 text-sm mb-4">Tölfræðin birtist hér þegar fyrsta salan dettur inn.</p>
+                                <button onclick="switchView('products')" class="text-sm font-bold text-highlight bg-navy px-4 py-2 rounded-lg hover:bg-opacity-90">Velja vörur</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. VÖRUÚRVAL -->
+                <div id="view-products" class="hidden fade-in space-y-8">
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <h1 class="text-3xl font-bold text-navy mb-2">Vöruúrval</h1>
+                            <p class="text-slate-500">Veldu þær vörur sem þú vilt selja. Þær vistast sjálfkrafa.</p>
+                        </div>
+                        <div class="text-right">
+                            <button id="save-selection-btn" onclick="saveSelectionToDB()" class="bg-navy text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-opacity-90 transition-all">Vista Val</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="all-products-grid"></div>
+                </div>
+
+                <!-- 3. MÍNAR VÖRUR -->
+                <div id="view-my-products" class="hidden fade-in space-y-8">
+                    <div class="flex flex-col md:flex-row justify-between md:items-end gap-4">
+                        <div>
+                            <h1 class="text-3xl font-bold text-navy mb-2">Mínar Vörur</h1>
+                            <p class="text-slate-500">Hér eru vörurnar sem þú valdir.</p>
+                        </div>
+                        <button onclick="openPosterModal()" class="bg-highlight text-navy px-6 py-3 rounded-xl text-sm font-bold hover:bg-yellow-300 transition-all flex items-center gap-2 shadow-lg shadow-yellow-400/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><path d="m9 16 3-3 3 3"/></svg>
+                            Búa til auglýsingaplakat
+                        </button>
+                    </div>
+                    
+                    <div class="bg-navy text-white p-6 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <p class="text-xs text-blue-200 uppercase font-bold mb-1">Þinn söluhlekkur</p>
+                            <code class="text-lg font-mono text-highlight" id="my-products-link">...</code>
+                        </div>
+                        <button onclick="copyLink()" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-bold transition-colors">Afrita hlekk</button>
+                    </div>
+
+                    <div id="my-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                    <div id="no-products-msg" class="hidden text-center py-12 text-slate-400">
+                        Þú hefur ekki valið neinar vörur ennþá.
+                    </div>
+                </div>
+
+                <!-- 4. ORDERS -->
+                <div id="view-orders" class="hidden fade-in space-y-8">
+                    <div>
+                        <h1 class="text-3xl font-bold text-navy mb-2">Pantanir</h1>
+                        <p class="text-slate-500">Raunverulegar pantanir frá sölusíðunni.</p>
+                    </div>
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">
+                                    <tr>
+                                        <th class="px-6 py-4">Dagsetning</th>
+                                        <th class="px-6 py-4">Kaupandi</th>
+                                        <th class="px-6 py-4">Vörur</th>
+                                        <th class="px-6 py-4 text-right">Samtals</th>
+                                        <th class="px-6 py-4 text-right">Hagnaður</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-navy divide-y divide-slate-50" id="orders-table-body"></tbody>
+                            </table>
+                        </div>
+                        <div id="no-orders-msg" class="p-12 text-center text-slate-400">Engar pantanir fundust í gagnagrunni.</div>
+                    </div>
+                </div>
+
+                <!-- 5. ADMIN -->
+                <div id="view-admin" class="hidden fade-in space-y-8 border-t-2 border-slate-100 pt-8 mt-8">
+                    <div>
+                        <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Stjórnandi</span>
+                        <h1 class="text-3xl font-bold text-navy mt-4 mb-2">Stjórnborð Hóps</h1>
+                        <p class="text-slate-500">Hér hefur þú yfirsýn yfir allan hópinn.</p>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-navy mb-4 text-lg">Stillingar hóps</h3>
+                            <div class="mb-4">
+                                <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Nafn hóps</label>
+                                <input type="text" id="admin-group-name-input" class="w-full p-3 bg-slate-50 rounded-xl border-none font-bold text-navy" readonly>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Lykilorð (Join Code)</label>
+                                    <code class="w-full p-3 bg-slate-50 rounded-xl font-mono text-navy border border-slate-200" id="admin-group-pass">...</code>
+                                </div>
+                                <button onclick="deleteGroup()" class="text-red-600 font-bold text-sm hover:underline mt-4">Eyða Hóp</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- MODALS -->
+    <div id="modal-overlay-group" class="fixed inset-0 bg-white z-50 hidden flex-col items-center justify-center p-6">
+        <div class="max-w-2xl w-full text-center">
+           <h1 class="text-4xl font-bold text-navy mb-4">Velkomin í TEMPO</h1>
+           <p class="text-slate-500 mb-12">Þú þarft að velja hóp til að halda áfram.</p>
+           <div class="grid md:grid-cols-2 gap-6">
+               <button onclick="openSubModal('create')" class="p-8 border border-slate-200 rounded-3xl hover:border-highlight hover:shadow-xl transition-all text-left group">
+                   <h3 class="text-xl font-bold text-navy mb-2 group-hover:text-highlight transition-colors">Stofna hóp</h3>
+                   <p class="text-slate-400 text-sm">Fyrir hópstjóra.</p>
+               </button>
+               <button onclick="openSubModal('join')" class="p-8 border border-slate-200 rounded-3xl hover:border-highlight hover:shadow-xl transition-all text-left group">
+                    <h3 class="text-xl font-bold text-navy mb-2 group-hover:text-highlight transition-colors">Ganga í hóp</h3>
+                   <p class="text-slate-400 text-sm">Fyrir seljendur.</p>
+               </button>
+           </div>
+           <button id="logout-btn-modal" class="mt-12 text-slate-400 hover:text-red-500">Skrá út</button>
+        </div>
+    </div>
+    
+    <div id="submodal-create" class="modal-overlay fixed inset-0 z-[60] items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full">
+            <h3 class="text-2xl font-bold text-navy mb-4">Stofna hóp</h3>
+            <input type="text" id="create-name" placeholder="Nafn hóps" class="w-full p-4 bg-slate-50 rounded-xl mb-4 border-none focus:ring-2 focus:ring-highlight">
+            <input type="text" id="create-pass" placeholder="Búa til lykilorð" class="w-full p-4 bg-slate-50 rounded-xl mb-6 border-none focus:ring-2 focus:ring-highlight">
+            <div class="flex gap-4">
+                <button onclick="closeSubModals()" class="flex-1 p-3 text-slate-500 font-bold">Hætta við</button>
+                <button onclick="submitCreateGroup()" class="flex-1 p-3 bg-navy text-white rounded-xl font-bold hover:bg-opacity-90">Stofna</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="submodal-join" class="modal-overlay fixed inset-0 z-[60] items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full">
+             <h3 class="text-2xl font-bold text-navy mb-4">Ganga í hóp</h3>
+            <input type="text" id="join-name" name="group_join_name" autocomplete="off" placeholder="Nafn hóps" class="w-full p-4 bg-slate-50 rounded-xl mb-4 border-none focus:ring-2 focus:ring-highlight">
+            <input type="password" id="join-pass" name="group_join_password" autocomplete="new-password" placeholder="Lykilorð hóps" class="w-full p-4 bg-slate-50 rounded-xl mb-6 border-none focus:ring-2 focus:ring-highlight">
+            <div class="flex gap-4">
+                <button onclick="closeSubModals()" class="flex-1 p-3 text-slate-500 font-bold">Hætta við</button>
+                <button onclick="submitJoinGroup()" class="flex-1 p-3 bg-navy text-white rounded-xl font-bold hover:bg-opacity-90">Ganga í</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MANUAL ORDER MODAL -->
+    <div id="modal-manual-order" class="modal-overlay fixed inset-0 z-50 items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8">
+            <h3 class="text-xl font-bold text-navy mb-4">Skrá sölu handvirkt</h3>
+            <div class="space-y-3 mb-6">
+                <input type="text" id="order-buyer" placeholder="Nafn kaupanda" class="w-full p-3 bg-slate-50 rounded-xl border-none text-sm">
+                <select id="order-product" class="w-full p-3 bg-slate-50 rounded-xl border-none text-sm text-navy font-medium"></select>
+                <input type="number" id="order-qty" placeholder="Magn" value="1" min="1" class="w-full p-3 bg-slate-50 rounded-xl border-none text-sm">
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeModals()" class="flex-1 py-3 text-slate-500 font-bold text-sm">Hætta við</button>
+                <button onclick="submitManualOrder()" class="flex-1 py-3 bg-navy text-white rounded-xl font-bold text-sm shadow-lg shadow-navy/20">Skrá sölu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POSTER MODAL -->
+    <div id="modal-poster" class="modal-overlay fixed inset-0 z-50 items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-3xl rounded-3xl shadow-2xl p-0 overflow-hidden my-8 relative">
+            <button onclick="closeModals()" class="absolute top-4 right-4 bg-white/80 p-2 rounded-full z-10 text-navy hover:bg-white"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            
+            <div class="p-6 bg-slate-50 border-b border-slate-100 flex flex-col gap-4">
+                <h3 class="text-xl font-bold text-navy">Búa til plakat</h3>
+                <div class="flex items-center gap-4">
+                     <label for="avatar-input" class="cursor-pointer bg-white border border-slate-200 text-navy px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-50 transition-colors flex items-center gap-2">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                         Velja mynd af mér
+                     </label>
+                     <input type="file" id="avatar-input" accept="image/*" class="hidden">
+                     <p class="text-xs text-slate-400">Myndin birtist á plakatinu.</p>
+                </div>
+            </div>
+
+            <div id="poster-content" class="poster-container p-0">
+                <!-- Poster Header -->
+                <div class="poster-header text-center">
+                    <div class="flex justify-center mb-2">
+                         <div class="w-12 h-12 bg-highlight rounded-lg flex items-center justify-center text-navy font-bold text-xl shadow-lg">:)</div>
+                    </div>
+                    <h2 class="text-4xl font-extrabold tracking-tight uppercase mb-1">Styrktu okkur!</h2>
+                    <p class="text-blue-100 text-sm font-medium uppercase tracking-widest">Söfnun fyrir <span id="poster-group-name">...</span></p>
+                </div>
+
+                <div class="p-8 pt-12 bg-white">
+                    <!-- Seller Info with Avatar -->
+                    <div class="flex flex-col items-center -mt-20 mb-8 relative z-10">
+                        <div class="w-32 h-32 rounded-full border-4 border-white shadow-xl bg-slate-200 overflow-hidden mb-3 relative">
+                             <img id="poster-avatar-preview" src="" class="w-full h-full object-cover hidden">
+                             <div id="poster-avatar-placeholder" class="w-full h-full flex items-center justify-center text-4xl font-bold text-slate-400 bg-slate-100">?</div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-navy"><span id="poster-seller-name">...</span></h3>
+                        <p class="text-slate-500 text-sm">er að safna fyrir ferðalaginu</p>
+                    </div>
+
+                    <!-- Products Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-8" id="poster-items-grid">
+                        <!-- Items will be injected here -->
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="bg-slate-50 rounded-2xl p-6 border-2 border-dashed border-slate-200 text-center">
+                        <p class="text-navy font-bold text-lg mb-2">Skannaðu til að panta</p>
+                        <div class="w-32 h-32 bg-white mx-auto p-2 rounded-lg shadow-sm border border-slate-100 flex items-center justify-center mb-2">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="text-navy"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><rect x="7" y="7" width="3" height="3"/><rect x="14" y="7" width="3" height="3"/><rect x="7" y="14" width="3" height="3"/><rect x="14" y="14" width="3" height="3"/></svg>
+                        </div>
+                         <p class="text-xs text-slate-400">eða farðu á: <span class="font-mono text-navy">tempo.is</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+                <p class="text-xs text-slate-400">Taktu skjáskot af plakatinu til að deila.</p>
+                <button onclick="window.print()" class="bg-navy text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-opacity-90 transition-all">Prenta / Vista</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed bottom-6 right-6 flex items-center gap-4 bg-navy text-white px-6 py-4 rounded-xl shadow-2xl transform translate-y-48 transition-all duration-500 z-50">
+        <div class="w-8 h-8 rounded-full bg-highlight text-navy flex items-center justify-center shrink-0 font-bold">!</div>
+        <div><h4 id="toast-title" class="font-bold text-sm"></h4><p id="toast-message" class="text-xs text-gray-300"></p></div>
+    </div>
+
+    <script>
+        // --- SUPABASE ---
+        const SUPABASE_URL = 'https://axwbfnnhbccoqtqaffaj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4d2Jmbm5oYmNjb3F0cWFmZmFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NTMxOTksImV4cCI6MjA3OTIyOTE5OX0.xEHFqIe8QYT22Yj375LNYqwPkwJA5hrVB6HyPASNobs';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const allProducts = [
+            { id: 1, name: "Lúxus Kerti - Vanilla", price: 2500, profit: 1000, img: "https://images.unsplash.com/photo-1602826665182-12628476a191?auto=format&fit=crop&w=400&q=80" },
+            { id: 2, name: "Gæða Kaffi (500g)", price: 2900, profit: 1200, img: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=400&q=80" },
+            { id: 3, name: "Íslenskur Lakkrís", price: 1500, profit: 600, img: "https://images.unsplash.com/photo-1582128133989-27f2e9c5168d?auto=format&fit=crop&w=400&q=80" },
+            { id: 4, name: "Ullarsokkar", price: 3500, profit: 1500, img: "https://images.unsplash.com/photo-1586236287184-7f6b53f6952b?auto=format&fit=crop&w=400&q=80" },
+            { id: 5, name: "Snyrtivörur", price: 4900, profit: 2000, img: "https://images.unsplash.com/photo-1612817288484-6f916006741a?auto=format&fit=crop&w=400&q=80" },
+            { id: 6, name: "Súkkulaðirúsínur", price: 1200, profit: 500, img: "https://images.unsplash.com/photo-1548187680-42e719c27e30?auto=format&fit=crop&w=400&q=80" },
+            { id: 7, name: "Salernispappír", price: 3200, profit: 1100, img: "https://images.unsplash.com/photo-1585421514738-01798e348bb2?auto=format&fit=crop&w=400&q=80" },
+            { id: 8, name: "Piparkökur", price: 2200, profit: 900, img: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?auto=format&fit=crop&w=400&q=80" },
+            { id: 9, name: "Gjafakort Tempo", price: 5000, profit: 2500, img: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?auto=format&fit=crop&w=400&q=80" },
+            { id: 10, name: "Jólaskraut", price: 3900, profit: 1800, img: "https://images.unsplash.com/photo-1512389142860-9c449e58a543?auto=format&fit=crop&w=400&q=80" },
+        ];
+
+        let currentUser = null;
+        let currentGroupId = null;
+        let selectedProductIds = new Set();
+        let orders = [];
+
+        // INIT FUNCTION
+        async function init() {
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                
+                if (!session) {
+                    document.getElementById('loading-screen').style.display = 'none';
+                    try { window.location.href = 'login.html'; } catch(e) { }
+                    return;
+                }
+
+                currentUser = session.user;
+                const meta = currentUser.user_metadata || {};
+                const fullName = meta.full_name || 'Notandi';
+                const groupName = meta.group_name || 'Hópur';
+                const role = meta.role || 'member';
+
+                // Safe DOM updates
+                safeSetText('top-user-name', fullName);
+                safeSetText('footer-user-name', fullName);
+                safeSetText('footer-group-name', groupName);
+                
+                const initials = fullName.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+                safeSetText('top-avatar', initials);
+                safeSetText('sidebar-avatar', initials);
+                safeSetText('poster-avatar-placeholder', initials); // Init poster placeholder
+
+                currentGroupId = meta.group_id;
+
+                // Check if group really exists, handle deletion
+                if (currentGroupId) {
+                    const { data: groupCheck, error } = await supabaseClient.from('groups').select('group_id').eq('group_id', currentGroupId).single();
+                    
+                    if (!groupCheck && !error) {
+                         // Group deleted, reset user
+                         await supabaseClient.auth.updateUser({
+                            data: { group_id: null, group_name: null, role: null, group_password: null }
+                         });
+                         location.reload();
+                         return;
+                    }
+
+                    const cleanGroup = groupName.replace(/\s+/g,'').toLowerCase();
+                    const link = `https://sage-melomakarona-da6a2b.netlify.app/sale.html?group=${currentGroupId}&seller=${currentUser.id}`;
+                    safeSetText('personal-link', link);
+                    safeSetText('my-products-link', link);
+
+                    await fetchSellerData();
+                    await fetchOrders();
+                    
+                    // Show leave btn
+                    document.getElementById('leave-group-btn').classList.remove('hidden');
+
+                    if (role === 'admin') {
+                        document.getElementById('admin-section').classList.remove('hidden');
+                        document.getElementById('admin-group-name-input').value = meta.group_name;
+                        safeSetText('admin-group-pass', meta.group_password || '****');
+                    }
+                } else {
+                    document.getElementById('modal-overlay-group').style.display = 'flex';
+                }
+
+                updateUI();
+
+            } catch (e) {
+                console.error("Init Error", e);
+            } finally {
+                const loader = document.getElementById('loading-screen');
+                if(loader) loader.style.display = 'none';
+            }
+        }
+
+        function safeSetText(id, text) {
+            const el = document.getElementById(id);
+            if(el) el.innerText = text;
+        }
+
+        async function fetchSellerData() {
+            const { data, error } = await supabaseClient
+                .from('sellers')
+                .select('selected_products')
+                .eq('user_id', currentUser.id)
+                .single();
+            
+            if (data && data.selected_products) {
+                const productIds = data.selected_products.map(p => p.id);
+                selectedProductIds = new Set(productIds);
+            }
+        }
+
+        async function fetchOrders() {
+            const { data, error } = await supabaseClient
+                .from('orders')
+                .select('*')
+                .eq('seller_id', currentUser.id);
+            
+            if (data) {
+                orders = data;
+            }
+        }
+
+        async function saveSelectionToDB() {
+            const productsToSave = allProducts.filter(p => selectedProductIds.has(p.id));
+            const { error } = await supabaseClient.from('sellers').upsert({ user_id: currentUser.id, selected_products: productsToSave });
+            if (error) { showToast('Villa', 'Gat ekki vistað.'); } 
+            else { showToast('Vistun tókst', 'Vöruvalið þitt hefur verið vistað.'); updateUI(); }
+        }
+
+        function updateUI() {
+            renderOverview();
+            renderProductSelection();
+            renderMyProducts();
+            renderOrdersTable();
+            populateOrderModal();
+        }
+
+        function renderOverview() {
+            const totalSales = orders.reduce((sum, o) => sum + o.total_sales, 0);
+            const totalProfit = orders.reduce((sum, o) => sum + o.total_profit, 0);
+            const totalCount = orders.length;
+            safeSetText('stat-total-sales', totalSales.toLocaleString('is-IS'));
+            safeSetText('stat-total-orders', totalCount);
+            safeSetText('stat-total-profit', totalProfit.toLocaleString('is-IS'));
+            const emptyState = document.getElementById('empty-graph-state');
+            if(emptyState) emptyState.style.display = totalCount > 0 ? 'none' : 'block';
+        }
+
+        function renderProductSelection() {
+            const grid = document.getElementById('all-products-grid');
+            if(!grid) return;
+            grid.innerHTML = allProducts.map(p => {
+                const isSelected = selectedProductIds.has(p.id);
+                return `<div class="product-card bg-white rounded-2xl p-4 cursor-pointer group hover:shadow-md ${isSelected ? 'selected' : ''}" onclick="toggleProduct(${p.id})">
+                    <div class="h-32 bg-slate-100 rounded-xl overflow-hidden mb-4 relative"><img src="${p.img}" class="w-full h-full object-cover"><div class="check-icon absolute top-2 right-2 w-6 h-6 bg-highlight text-navy rounded-full flex items-center justify-center opacity-0 transition-all transform scale-0 shadow-sm">✓</div></div>
+                    <h4 class="font-bold text-navy">${p.name}</h4><div class="flex justify-between text-sm mt-1"><span class="text-slate-500">${p.price.toLocaleString()} kr</span><span class="text-green-600 font-medium">Hagn: ${p.profit.toLocaleString()}</span></div></div>`;
+            }).join('');
+        }
+
+        function renderMyProducts() {
+            const grid = document.getElementById('my-products-grid');
+            if(!grid) return;
+            const selected = allProducts.filter(p => selectedProductIds.has(p.id));
+            const noMsg = document.getElementById('no-products-msg');
+            if (selected.length === 0) { if(noMsg) noMsg.style.display = 'block'; grid.innerHTML = ''; return; }
+            if(noMsg) noMsg.style.display = 'none';
+            grid.innerHTML = selected.map(p => `<div class="bg-white rounded-2xl border border-slate-100 p-4 flex gap-4 items-center"><div class="w-16 h-16 bg-slate-100 rounded-lg overflow-hidden shrink-0"><img src="${p.img}" class="w-full h-full object-cover"></div><div><h4 class="font-bold text-navy text-sm">${p.name}</h4><p class="text-slate-500 text-xs">${p.price.toLocaleString()} kr</p></div></div>`).join('');
+        }
+
+        function renderOrdersTable() {
+            const tbody = document.getElementById('orders-table-body');
+            if(!tbody) return;
+            const noMsg = document.getElementById('no-orders-msg');
+            if (orders.length === 0) { if(noMsg) noMsg.style.display = 'block'; tbody.innerHTML = ''; return; }
+            if(noMsg) noMsg.style.display = 'none';
+            tbody.innerHTML = orders.map(o => `<tr class="hover:bg-slate-50 transition-colors"><td class="px-6 py-4 text-slate-500">${new Date(o.created_at).toLocaleDateString('is-IS')}</td><td class="px-6 py-4 font-bold text-navy">${o.buyer_name || 'Óþekktur'}</td><td class="px-6 py-4 text-slate-500">${o.items.length} vörur</td><td class="px-6 py-4 text-right font-mono">${o.total_sales.toLocaleString()} kr</td><td class="px-6 py-4 text-right font-mono text-green-600">+${o.total_profit.toLocaleString()} kr</td></tr>`).join('');
+        }
+
+        function toggleProduct(id) {
+            if (selectedProductIds.has(id)) selectedProductIds.delete(id);
+            else selectedProductIds.add(id);
+            updateUI();
+        }
+
+        function switchView(viewId) {
+            ['overview', 'products', 'my-products', 'orders', 'admin'].forEach(id => {
+                document.getElementById(`view-${id}`)?.classList.add('hidden');
+                document.getElementById(`nav-${id}`)?.classList.remove('active');
+            });
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            document.getElementById(`nav-${viewId}`).classList.add('active');
+        }
+
+        function openPosterModal() {
+            if (selectedProductIds.size === 0) { showToast('Engar vörur', 'Veldu vörur fyrst!'); return; }
+            const meta = currentUser ? currentUser.user_metadata : {};
+            safeSetText('poster-seller-name', meta.full_name || 'Nafn');
+            safeSetText('poster-group-name', meta.group_name || 'Hópur');
+            
+            const list = document.getElementById('poster-items-grid');
+            const selected = allProducts.filter(p => selectedProductIds.has(p.id));
+            
+            // Use Grid Layout for products
+            list.innerHTML = selected.map(p => `
+                <div class="border border-slate-200 rounded-lg overflow-hidden bg-white">
+                    <div class="h-24 bg-slate-100 relative">
+                        <img src="${p.img}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-2 text-left">
+                        <p class="font-bold text-navy text-xs truncate">${p.name}</p>
+                        <p class="text-highlight font-bold text-sm">${p.price.toLocaleString()} kr</p>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('modal-poster').classList.add('active');
+        }
+        
+        // --- AVATAR UPLOAD LOGIC ---
+        document.getElementById('avatar-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('poster-avatar-preview');
+                    const placeholder = document.getElementById('poster-avatar-placeholder');
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function openManualOrderModal() {
+            if (selectedProductIds.size === 0) { showToast('Engar vörur', 'Veldu vörur fyrst!'); switchView('products'); return; }
+            populateOrderModal();
+            document.getElementById('modal-manual-order').classList.add('active');
+        }
+
+        function populateOrderModal() {
+            const select = document.getElementById('order-product');
+            if(!select) return;
+            const selected = allProducts.filter(p => selectedProductIds.has(p.id));
+            select.innerHTML = selected.map(p => `<option value="${p.id}">${p.name} (${p.price} kr)</option>`).join('');
+        }
+
+        async function submitManualOrder() {
+            const buyer = document.getElementById('order-buyer').value;
+            const prodId = parseInt(document.getElementById('order-product').value);
+            const qty = parseInt(document.getElementById('order-qty').value);
+            if (!buyer || !prodId) return;
+
+            const product = allProducts.find(p => p.id === prodId);
+            const newOrder = {
+                group_id: currentGroupId,
+                seller_id: currentUser.id,
+                buyer_name: buyer,
+                items: [{product_id: prodId, name: product.name, qty: qty, price: product.price}],
+                total_sales: product.price * qty,
+                total_profit: product.profit * qty,
+                status: 'Greitt'
+            };
+            
+            const { error } = await supabaseClient.from('orders').insert([newOrder]);
+            if (error) { showToast('Villa', error.message); return; }
+            
+            orders.unshift({...newOrder, created_at: new Date().toISOString()});
+            closeModals();
+            showToast('Sala skráð!', `Pöntun vistuð.`);
+            updateUI();
+        }
+
+        // --- GROUP ACTIONS ---
+        async function leaveGroup() {
+            if(!confirm("Ertu viss um að þú viljir yfirgefa hópinn?")) return;
+            const { error } = await supabaseClient.auth.updateUser({ data: { group_id: null, group_name: null, role: null, group_password: null } });
+            if (error) showToast("Villa", "Gat ekki yfirgefið hóp.");
+            else location.reload();
+        }
+
+        async function deleteGroup() {
+            if(!confirm("Ertu viss? Þetta eyðir hópnum fyrir alla. Óafturkræft.")) return;
+            const { error } = await supabaseClient.from('groups').delete().eq('group_id', currentGroupId);
+            if (error) { showToast("Villa", "Gat ekki eytt hóp."); return; }
+            
+            await supabaseClient.auth.updateUser({ data: { group_id: null, group_name: null, role: null, group_password: null } });
+            location.reload();
+        }
+
+        window.openSubModal = function(type) { document.getElementById('modal-overlay-group').style.display = 'none'; document.getElementById(`submodal-${type}`).classList.add('active'); }
+        window.closeSubModals = function() { document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active')); document.getElementById('modal-overlay-group').style.display = 'flex'; }
+        function closeModals() { document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active')); }
+
+        async function submitCreateGroup() {
+            const name = document.getElementById('create-name').value;
+            const pass = document.getElementById('create-pass').value;
+            if(!name || !pass) return;
+            const { data: groupData, error } = await supabaseClient.from('groups').insert([{ group_name: name, group_password: pass, admin_id: currentUser.id }]).select().single();
+            if (error) { showToast('Villa', error.message); return; }
+            await supabaseClient.auth.updateUser({ data: { group_id: groupData.group_id, group_name: name, group_password: pass, role: 'admin' } });
+            location.reload();
+        }
+
+        async function submitJoinGroup() {
+             const name = document.getElementById('join-name').value;
+             const pass = document.getElementById('join-pass').value;
+             if(!name) return;
+             const { data: groups, error } = await supabaseClient.from('groups').select('*').eq('group_name', name).single();
+             if (error || !groups || groups.group_password !== pass) { showToast('Villa', 'Hópur fannst ekki eða rangt lykilorð.'); return; }
+             await supabaseClient.auth.updateUser({ data: { group_id: groups.group_id, group_name: groups.group_name, role: 'member' } });
+             location.reload();
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-48');
+            setTimeout(() => toast.classList.add('translate-y-48'), 3000);
+        }
+        function copyLink() {
+            navigator.clipboard.writeText(document.getElementById('personal-link').innerText);
+            showToast('Afritað', 'Hlekkur afritaður.');
+        }
+        const logout = async () => { await supabaseClient.auth.signOut(); try { window.location.href = 'index.html'; } catch(e) {} };
+        document.getElementById('logout-btn-sidebar').addEventListener('click', logout);
+        document.getElementById('logout-btn-modal').addEventListener('click', logout);
+
+        init();
+    </script>
+</body>
+</html>
