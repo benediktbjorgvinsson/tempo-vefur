@@ -151,7 +151,7 @@
                             <h2 class="text-xl font-bold text-navy mb-2">Ógildur hlekkur</h2>
                             <p class="text-slate-500 max-w-md text-sm">Þessi söluhlekkur virðist vera gamall eða vitlaus. Vinsamlegast fáðu nýjan hlekk frá seljanda.</p>
                         </div>`;
-                    // We just replaced the body, so no need to hide loader explicitly here as it's gone
+                    // Ekki fela loader hér því við höfum þegar skipt út body
                     return;
                 }
 
@@ -186,7 +186,7 @@
                 console.error("Init error:", error);
                 document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-red-500">Villa kom upp. Vinsamlegast reyndu aftur síðar.</div>`;
             } finally {
-                // Only try to hide if the element still exists
+                // Öruggt felun á hleðsluskjá
                 const loader = document.getElementById('loading-screen');
                 if (loader) loader.style.display = 'none';
             }
