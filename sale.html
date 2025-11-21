@@ -142,18 +142,21 @@
 
         // --- INIT ---
         async function init() {
-            try {
-                // Villutékk á hlekk
-                if (!SELLER_ID || !isValidUUID(SELLER_ID) || (GROUP_ID && !isValidUUID(GROUP_ID))) {
-                    document.body.innerHTML = `
-                        <div class="flex h-screen flex-col items-center justify-center text-center p-8">
-                            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-4 text-2xl font-bold shadow-sm">!</div>
-                            <h2 class="text-xl font-bold text-navy mb-2">Ógildur hlekkur</h2>
-                            <p class="text-slate-500 max-w-md text-sm">Þessi söluhlekkur virðist vera gamall eða vitlaus. Vinsamlegast fáðu nýjan hlekk frá seljanda.</p>
-                        </div>`;
-                    return;
-                }
+            const loader = document.getElementById('loading-screen');
+            
+            // Villutékk á hlekk - Ef hlekkur er ógildur, skiptum út body og hættum.
+            // Þá er loader farinn, svo við þurfum ekki að fela hann.
+            if (!SELLER_ID || !isValidUUID(SELLER_ID) || (GROUP_ID && !isValidUUID(GROUP_ID))) {
+                document.body.innerHTML = `
+                    <div class="flex h-screen flex-col items-center justify-center text-center p-8">
+                        <div class="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-4 text-2xl font-bold shadow-sm">!</div>
+                        <h2 class="text-xl font-bold text-navy mb-2">Ógildur hlekkur</h2>
+                        <p class="text-slate-500 max-w-md text-sm">Þessi söluhlekkur virðist vera gamall eða vitlaus. Vinsamlegast fáðu nýjan hlekk frá seljanda.</p>
+                    </div>`;
+                return;
+            }
 
+            try {
                 // 1. Sækja vörur seljanda
                 const { data: sellerData, error: sellerError } = await supabaseClient
                     .from('sellers')
@@ -181,13 +184,14 @@
                     availableProducts = sellerData.selected_products;
                     renderProducts();
                 }
+                
+                // Fela loader ef allt gekk vel
+                if(loader) loader.style.display = 'none';
+
             } catch (error) {
                 console.error("Init error:", error);
+                // Ef alvarleg villa, sýna skilaboð
                 document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-red-500">Villa kom upp. Vinsamlegast reyndu aftur síðar.</div>`;
-            } finally {
-                // VIÐGERÐ: Athuga hvort element sé til áður en stíl er breytt
-                const loader = document.getElementById('loading-screen');
-                if (loader) loader.style.display = 'none';
             }
         }
 
@@ -296,7 +300,7 @@
                     items: items,
                     total_sales: totalSales,
                     total_profit: totalProfit,
-                    status: 'Greitt'
+                    status: 'Greitt' // Mock status
                 }]);
 
             if (error) {
