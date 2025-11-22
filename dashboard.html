@@ -3,256 +3,361 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEMPO - Mín Söfnun</title>
-    
-    <!-- Libraries -->
+    <title>TEMPO - Stjórnborð</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F3F4F6; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; color: #0F172A; }
         
         /* Brand Colors */
-        .bg-navy { background-color: #0A1C2E; }
         .text-navy { color: #0A1C2E; }
-        .border-navy { border-color: #0A1C2E; }
-        .bg-accent { background-color: #FACC15; }
-        .text-accent { color: #FACC15; }
+        .bg-navy { background-color: #0A1C2E; }
+        .bg-highlight { background-color: #FACC15; }
+        .text-highlight { color: #FACC15; }
         
-        /* Transitions */
-        .transition-smooth { transition: all 0.2s ease-in-out; }
+        /* Sidebar Navigation */
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; font-weight: 500; color: #64748B; transition: all 0.2s ease; width: 100%; text-align: left; margin-bottom: 4px; cursor: pointer; }
+        .nav-item:hover { background-color: #F1F5F9; color: #0A1C2E; }
+        .nav-item.active { background-color: #FACC15; color: #0A1C2E; font-weight: 700; box-shadow: 0 4px 6px -1px rgba(250, 204, 21, 0.2); }
+
+        /* Product Cards */
+        .product-card { transition: all 0.3s ease; border: 1px solid #E2E8F0; }
+        .product-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-color: #CBD5E1; }
+        .product-card.selected { border-color: #FACC15; background-color: #FEFCE8; box-shadow: 0 4px 6px -1px rgba(250, 204, 21, 0.3); }
+        .product-card.selected .check-icon { opacity: 1; transform: scale(1); }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Modal Animations */
-        .modal-enter { animation: modalIn 0.3s ease-out forwards; }
-        .modal-exit { animation: modalOut 0.2s ease-in forwards; }
+        .modal-overlay { display: none; background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 50; }
+        .modal-overlay.active { display: flex; }
         
-        @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+        /* A4 Poster Styles */
+        .poster-wrapper {
+            width: 100%;
+            max-width: 210mm; 
+            aspect-ratio: 210/297; 
+            background: white;
+            margin: 0 auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
-        @keyframes modalOut {
-            from { opacity: 1; transform: scale(1); }
-            to { opacity: 0; transform: scale(0.95); }
+        
+        .poster-header {
+            background: #0A1C2E;
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .poster-header::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: white;
+            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+            transform: scaleX(1.1);
         }
 
-        /* Poster Aspect Ratio (A4) */
-        .poster-container {
-            aspect-ratio: 210/297;
-            max-height: 80vh;
+        .poster-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            padding: 2rem;
+            flex-grow: 1;
+            align-content: start;
+        }
+        
+        /* Dynamic Grid Adjustment */
+        .poster-wrapper.many-items .poster-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            padding: 1.5rem;
+        }
+        
+        @media print {
+            body * { visibility: hidden; }
+            #poster-content, #poster-content * { visibility: visible; }
+            #poster-content { position: absolute; left: 0; top: 0; width: 100%; height: 100%; margin: 0; padding: 0; box-shadow: none; }
+            @page { size: A4; margin: 0; }
         }
     </style>
 </head>
-<body class="text-slate-800 h-screen flex overflow-hidden">
+<body class="h-screen flex overflow-hidden bg-white text-slate-900">
+
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-[100] flex items-center justify-center transition-opacity duration-500">
+        <div class="flex flex-col items-center gap-4">
+            <div class="w-12 h-12 bg-highlight rounded-xl flex items-center justify-center animate-pulse text-navy font-bold text-xl shadow-lg">T</div>
+            <p class="text-sm text-slate-400 font-medium animate-pulse">Hleð stjórnborði...</p>
+        </div>
+    </div>
 
     <!-- SIDEBAR -->
-    <aside class="w-72 bg-navy text-white flex-col hidden md:flex shadow-xl z-20">
-        <!-- Logo -->
-        <div class="h-20 flex items-center px-8 border-b border-white/10">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-accent rounded-lg flex items-center justify-center text-navy font-bold text-lg">
-                    <i data-lucide="zap" class="w-5 h-5"></i>
-                </div>
-                <span class="text-xl font-bold tracking-tight">TEMPO</span>
+    <aside class="hidden md:flex w-72 flex-col bg-navy text-white h-full z-20 shrink-0 p-6 shadow-sm">
+        <div class="flex items-center gap-3 mb-10 px-2">
+            <div class="w-9 h-9 bg-highlight rounded-lg flex items-center justify-center text-navy font-bold text-lg shadow-md">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
             </div>
+            <span class="text-xl font-bold text-white tracking-tight">TEMPO</span>
         </div>
 
-        <!-- Menu -->
-        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Valmynd</p>
-            
-            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-accent text-navy rounded-xl font-bold transition-smooth shadow-lg shadow-accent/10">
-                <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Minn prófíll
-            </a>
-            
-            <a href="#products" class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-xl font-medium transition-smooth">
-                <i data-lucide="shopping-bag" class="w-5 h-5"></i> Vöruúrval
-            </a>
-            
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-xl font-medium transition-smooth">
-                <i data-lucide="package" class="w-5 h-5"></i> Mínar vörur
-            </a>
+        <nav class="flex-1 space-y-1">
+            <button onclick="switchView('overview')" id="nav-overview" class="nav-item active text-navy">
+                <lucide-icon name="layout-dashboard"></lucide-icon> Minn Prófíll
+            </button>
+            <button onclick="switchView('products')" id="nav-products" class="nav-item text-slate-300 hover:text-white">
+                <lucide-icon name="shopping-bag"></lucide-icon> Vöruval
+            </button>
+            <button onclick="switchView('orders')" id="nav-orders" class="nav-item text-slate-300 hover:text-white">
+                <lucide-icon name="shopping-cart"></lucide-icon> Pantanir
+            </button>
+            <button onclick="switchView('settings')" id="nav-settings" class="nav-item text-slate-300 hover:text-white">
+                <lucide-icon name="settings"></lucide-icon> Mínar Stillingar
+            </button>
 
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-xl font-medium transition-smooth">
-                <i data-lucide="settings" class="w-5 h-5"></i> Mínar stillingar
-            </a>
-
-            <!-- Admin Link (Only visible to admins logic would go here) -->
-            <div id="admin-link-container" class="pt-4 mt-4 border-t border-white/10">
-                <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Stjórnun</p>
-                <a href="admin.html" class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-xl font-medium transition-smooth">
-                    <i data-lucide="shield" class="w-5 h-5"></i> Hópurinn minn
+            <div id="admin-link-container" class="hidden pt-6 mt-6 border-t border-white/10">
+                <p class="px-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Stjórnun</p>
+                <a href="admin.html" class="nav-item text-slate-300 hover:text-white bg-white/5 hover:bg-white/10">
+                    <lucide-icon name="shield"></lucide-icon> Stjórnborð Hóps
                 </a>
             </div>
         </nav>
 
-        <!-- Footer Actions -->
-        <div class="p-4 border-t border-white/10 space-y-2">
-            <button onclick="leaveGroup()" class="w-full flex items-center gap-3 px-4 py-3 text-red-300 hover:bg-red-900/30 hover:text-red-200 rounded-xl font-medium transition-smooth">
-                <i data-lucide="log-out" class="w-5 h-5"></i> Skrá úr hóp
+        <div class="mt-auto pt-6 border-t border-white/10 space-y-2">
+            <button onclick="leaveGroup()" class="nav-item text-red-300 hover:text-red-100 hover:bg-red-900/20">
+                <lucide-icon name="log-out"></lucide-icon> Skrá úr hóp
             </button>
-            <div class="flex items-center gap-3 px-4 py-3 mt-2">
-                <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold border border-white/20">BB</div>
+            <button onclick="logout()" class="nav-item text-slate-400 hover:text-white">
+                <lucide-icon name="power"></lucide-icon> Skrá út
+            </button>
+            
+            <!-- User Mini Profile -->
+            <div class="flex items-center gap-3 mt-6 px-2">
+                <img id="sidebar-avatar" class="w-10 h-10 rounded-full bg-white/10 object-cover border border-white/20 hidden">
+                <div id="sidebar-initials" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold text-sm border border-white/20">NN</div>
                 <div class="overflow-hidden">
-                    <p class="text-sm font-bold truncate">Benedikt B.</p>
-                    <p class="text-xs text-slate-400 truncate">Skrá út</p>
+                    <p class="text-sm font-bold truncate" id="sidebar-name">...</p>
+                    <p class="text-xs text-slate-400 truncate" id="sidebar-group">...</p>
                 </div>
             </div>
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden">
-        
+    <!-- MAIN -->
+    <main class="flex-1 flex flex-col overflow-hidden relative bg-[#F8FAFC]">
         <!-- Header -->
-        <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-10 flex-shrink-0">
-            <h2 class="text-xl font-bold text-navy">Yfirlit</h2>
+        <div class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0 z-10">
+            <div class="font-bold text-navy text-lg md:hidden">TEMPO</div>
+            <h2 class="hidden md:block text-lg font-bold text-navy" id="page-title">Yfirlit</h2>
             
             <div class="flex items-center gap-6">
                 <!-- Notifications -->
                 <div class="relative group">
-                    <button class="p-2 text-slate-400 hover:text-navy transition-colors relative">
-                        <i data-lucide="bell" class="w-6 h-6"></i>
-                        <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-accent rounded-full border-2 border-white"></span>
+                    <button class="p-2 text-slate-400 hover:text-navy hover:bg-slate-50 rounded-full transition-colors relative">
+                        <lucide-icon name="bell" class="w-6 h-6"></lucide-icon>
+                        <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-highlight rounded-full border-2 border-white shadow-sm"></span>
                     </button>
+                    
                     <!-- Dropdown -->
-                    <div class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-100 hidden group-hover:block p-1 z-50 animate-in fade-in zoom-in-95 duration-200">
-                        <div class="px-4 py-3 border-b border-slate-50"><h3 class="font-bold text-navy text-sm">Tilkynningar</h3></div>
-                        <div class="max-h-64 overflow-y-auto">
-                            <div class="p-3 hover:bg-slate-50 rounded-lg cursor-pointer flex items-start gap-3 border-b border-slate-50/50">
-                                <div class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center shrink-0 text-xs">💰</div>
-                                <div><p class="text-sm text-navy font-medium">Jón keypti 3x kerti</p><p class="text-xs text-slate-400 mt-0.5">4.500 kr • Fyrir 5 mín</p></div>
+                    <div class="absolute right-0 mt-4 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 hidden group-hover:block p-2 z-50 origin-top-right animate-in fade-in zoom-in-95 duration-200">
+                        <div class="px-4 py-3 border-b border-slate-50">
+                            <h3 class="font-bold text-navy text-sm">Tilkynningar</h3>
+                        </div>
+                        <div class="p-1 space-y-1">
+                            <div class="p-3 hover:bg-slate-50 rounded-xl cursor-pointer flex gap-3 items-start transition-colors">
+                                <div class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center shrink-0 text-sm">💰</div>
+                                <div>
+                                    <p class="text-sm text-navy font-medium">Ný pöntun skráð</p>
+                                    <p class="text-xs text-slate-400 mt-0.5">Athugaðu stöðuna</p>
+                                </div>
                             </div>
-                            <div class="p-3 hover:bg-slate-50 rounded-lg cursor-pointer flex items-start gap-3">
-                                <div class="w-8 h-8 bg-accent/20 text-yellow-700 rounded-full flex items-center justify-center shrink-0 text-xs">🎉</div>
-                                <div><p class="text-sm text-navy font-medium">Þú náðir 50.000 kr!</p><p class="text-xs text-slate-400 mt-0.5">Frábær árangur!</p></div>
+                            <div class="p-3 hover:bg-slate-50 rounded-xl cursor-pointer flex gap-3 items-start transition-colors">
+                                <div class="w-8 h-8 bg-highlight/20 text-yellow-700 rounded-full flex items-center justify-center shrink-0 text-sm">🏆</div>
+                                <div>
+                                    <p class="text-sm text-navy font-medium">Þú náðir 50.000 kr!</p>
+                                    <p class="text-xs text-slate-400 mt-0.5">Frábær árangur! 🎉</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <div class="flex items-center gap-3 pl-6 border-l border-slate-100">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold text-navy" id="header-name">...</p>
+                        <p class="text-xs text-slate-500" id="header-group">...</p>
+                    </div>
+                    <div class="w-10 h-10 bg-navy text-white rounded-full flex items-center justify-center font-bold overflow-hidden border-2 border-white shadow-sm">
+                        <img id="header-avatar" class="w-full h-full object-cover hidden">
+                        <span id="header-initials">NN</span>
+                    </div>
+                </div>
             </div>
-        </header>
+        </div>
 
-        <!-- Scrollable Content -->
-        <div class="flex-1 overflow-y-auto p-8">
-            <div class="max-w-6xl mx-auto space-y-8 pb-12">
-
-                <!-- Share Link Card (Navy Background) -->
-                <div class="bg-navy rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-accent opacity-5 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3"></div>
+        <!-- Content -->
+        <div class="flex-1 overflow-y-auto p-6 md:p-10 scroll-smooth">
+            <div class="max-w-6xl mx-auto pb-20">
+                
+                <!-- VIEW: OVERVIEW -->
+                <div id="view-overview" class="fade-in space-y-8">
                     
-                    <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div class="space-y-2">
-                            <div class="flex items-center gap-2 text-accent mb-1">
-                                <i data-lucide="link" class="w-4 h-4"></i>
-                                <span class="text-xs font-bold uppercase tracking-wider">Þinn söluhlekkur</span>
+                    <!-- Stats Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="p-2 bg-green-50 text-green-600 rounded-lg"><lucide-icon name="wallet" class="w-5 h-5"></lucide-icon></div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Þú hefur safnað</p>
                             </div>
-                            <h2 class="text-2xl font-bold">Deildu hlekknum til að byrja að safna!</h2>
-                            <p class="text-slate-300 text-sm max-w-lg">Sendu þennan hlekk á fjölskyldu og vini. Allt sem þeir kaupa skráist sjálfkrafa á þig.</p>
+                            <p class="text-4xl font-bold text-navy tracking-tight"><span id="stat-sales">0</span> kr.</p>
                         </div>
-                        
-                        <div class="flex flex-col gap-3 w-full md:w-auto">
-                            <div class="flex items-center bg-white/10 backdrop-blur-sm rounded-xl p-1.5 border border-white/10 min-w-[300px]">
-                                <code class="flex-1 px-3 font-mono text-sm text-accent truncate" id="sales-link-text">tempo.is/s/fg-2026/benedikt</code>
-                                <button onclick="copyLink()" class="bg-white text-navy px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-100 transition-smooth active:scale-95">
-                                    Afrita
-                                </button>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="p-2 bg-blue-50 text-blue-600 rounded-lg"><lucide-icon name="shopping-cart" class="w-5 h-5"></lucide-icon></div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pantanir alls</p>
                             </div>
-                            <button onclick="openPosterModal()" class="w-full flex items-center justify-center gap-2 text-sm font-bold text-white bg-white/10 hover:bg-white/20 py-3 rounded-xl border border-white/10 transition-smooth">
-                                <i data-lucide="file-image" class="w-4 h-4"></i>
+                            <p class="text-4xl font-bold text-navy tracking-tight"><span id="stat-orders">0</span> stk</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="p-2 bg-yellow-50 text-yellow-600 rounded-lg"><lucide-icon name="trending-up" class="w-5 h-5"></lucide-icon></div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Meðalupphæð</p>
+                            </div>
+                            <p class="text-4xl font-bold text-navy tracking-tight"><span id="stat-avg">0</span> kr.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Sales Chart -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm lg:col-span-2">
+                            <h3 class="font-bold text-navy mb-6 flex items-center gap-2"><lucide-icon name="bar-chart-3" class="w-5 h-5 text-slate-400"></lucide-icon> Söluþróun (Vörur)</h3>
+                            <div class="h-64 w-full relative">
+                                <canvas id="salesChart"></canvas>
+                                <div id="empty-chart-msg" class="absolute inset-0 flex items-center justify-center text-slate-400 text-sm hidden">
+                                    Engin gögn komin ennþá
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Link Card -->
+                        <div class="bg-navy text-white p-8 rounded-2xl shadow-xl relative overflow-hidden flex flex-col justify-center">
+                            <div class="absolute top-0 right-0 w-48 h-48 bg-highlight opacity-10 blur-[60px] rounded-full"></div>
+                            <p class="text-highlight font-bold text-xs uppercase mb-2 relative z-10">Söluhlekkurinn þinn</p>
+                            <h3 class="text-2xl font-bold mb-6 relative z-10">Deildu og byrjaðu að safna!</h3>
+                            
+                            <div class="bg-white/10 backdrop-blur-md p-2 rounded-xl flex items-center gap-2 relative z-10 border border-white/10 mb-4">
+                                <code class="flex-1 text-xs font-mono truncate px-2 text-blue-100" id="personal-link">...</code>
+                                <button onclick="copyLink()" class="bg-white text-navy px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-100 transition-colors">Afrita</button>
+                            </div>
+
+                            <button onclick="openPosterModal()" class="w-full py-3.5 bg-highlight text-navy rounded-xl font-bold text-sm hover:bg-yellow-300 transition-all flex items-center justify-center gap-2 relative z-10 shadow-lg shadow-yellow-900/20">
+                                <lucide-icon name="file-image" class="w-4 h-4"></lucide-icon>
                                 Búa til auglýsingaplakat
                             </button>
                         </div>
                     </div>
-                </div>
-
-                <!-- Stats Row -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Raised -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-smooth">
-                        <div class="flex items-center justify-between mb-4">
-                            <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Þú hefur safnað</p>
-                            <div class="p-2 bg-green-50 text-green-600 rounded-lg"><i data-lucide="wallet" class="w-5 h-5"></i></div>
-                        </div>
-                        <p class="text-4xl font-bold text-navy tracking-tight">30.800 kr.</p>
-                    </div>
-
-                    <!-- Orders -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-smooth">
-                        <div class="flex items-center justify-between mb-4">
-                            <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Pantanir alls</p>
-                            <div class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="shopping-cart" class="w-5 h-5"></i></div>
-                        </div>
-                        <p class="text-4xl font-bold text-navy tracking-tight">8 stk</p>
-                    </div>
-
-                    <!-- My Profit (Changed from Avg Order) -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-smooth">
-                        <div class="flex items-center justify-between mb-4">
-                            <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Hagnaður minn</p>
-                            <div class="p-2 bg-yellow-50 text-yellow-700 rounded-lg"><i data-lucide="piggy-bank" class="w-5 h-5"></i></div>
-                        </div>
-                        <p class="text-4xl font-bold text-navy tracking-tight">12.500 kr.</p>
-                    </div>
-                </div>
-
-                <!-- Charts & Tables -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Chart -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm lg:col-span-2">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="font-bold text-navy text-lg">Söluþróun</h3>
-                            <select class="bg-slate-50 border border-slate-200 text-xs font-bold text-navy rounded-lg px-3 py-1.5 outline-none">
-                                <option>Síðustu 7 daga</option>
-                            </select>
-                        </div>
-                        <div class="h-64 w-full">
-                            <canvas id="salesChart"></canvas>
-                        </div>
-                    </div>
-
+                    
                     <!-- Recent Orders -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm lg:col-span-1 overflow-hidden flex flex-col">
-                        <h3 class="font-bold text-navy text-lg mb-4">Nýjustu pantanir</h3>
-                        <div class="overflow-y-auto flex-1 pr-2 space-y-3" id="recent-orders-list">
-                            <!-- Filled via JS -->
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div class="p-6 border-b border-slate-50 flex justify-between items-center">
+                            <h3 class="font-bold text-navy">Nýjustu pantanir</h3>
+                            <button onclick="switchView('orders')" class="text-sm font-bold text-highlight hover:text-yellow-600 transition-colors">Sjá allar</button>
                         </div>
-                        <button class="w-full mt-4 py-2.5 text-sm font-bold text-navy bg-slate-50 rounded-xl hover:bg-slate-100 transition-smooth">
-                            Sjá allar pantanir
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50/50 text-slate-500 font-medium">
+                                    <tr>
+                                        <th class="px-6 py-4">Dags</th>
+                                        <th class="px-6 py-4">Kaupandi</th>
+                                        <th class="px-6 py-4">Vörur</th>
+                                        <th class="px-6 py-4 text-right">Upphæð</th>
+                                        <th class="px-6 py-4">Staða</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-50 text-navy" id="recent-orders-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: PRODUCTS -->
+                <div id="view-products" class="hidden fade-in space-y-6">
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <h1 class="text-3xl font-bold text-navy mb-2">Vöruúrval</h1>
+                            <p class="text-slate-500">Veldu þær vörur sem þú vilt hafa í versluninni þinni.</p>
+                        </div>
+                        <button onclick="saveSelection()" class="bg-navy text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-opacity-90 transition-all flex items-center gap-2">
+                            <lucide-icon name="save" class="w-4 h-4"></lucide-icon> Vista Val
                         </button>
                     </div>
+                    
+                    <!-- Product Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid"></div>
                 </div>
 
-                <!-- Product Catalog -->
-                <div id="products" class="pt-4">
-                    <div class="flex items-center justify-between mb-6">
-                        <div>
-                            <h3 class="text-2xl font-bold text-navy">Vöruúrval</h3>
-                            <p class="text-slate-500 text-sm">Veldu vörur sem þú vilt hafa í versluninni þinni.</p>
-                        </div>
-                        <div class="flex gap-2">
-                             <span class="px-3 py-1 bg-accent text-navy text-xs font-bold rounded-full flex items-center">
-                                 <i data-lucide="check" class="w-3 h-3 mr-1"></i> Valdar: <span id="selected-count" class="ml-1">3</span>
-                             </span>
-                        </div>
+                <!-- VIEW: ORDERS -->
+                <div id="view-orders" class="hidden fade-in space-y-6">
+                    <h1 class="text-3xl font-bold text-navy">Pantanir</h1>
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                         <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">
+                                <tr>
+                                    <th class="px-6 py-4">Dags</th>
+                                    <th class="px-6 py-4">Kaupandi</th>
+                                    <th class="px-6 py-4 w-1/3">Vörur</th>
+                                    <th class="px-6 py-4 text-right">Samtals</th>
+                                    <th class="px-6 py-4">Staða</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50 text-navy" id="full-orders-body"></tbody>
+                        </table>
                     </div>
-                    
-                    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Products will be injected here by JS -->
-                    </div>
-                    
-                    <!-- Empty State (Hidden by default) -->
-                    <div id="empty-products" class="hidden bg-white border border-dashed border-slate-300 rounded-3xl p-12 text-center">
-                        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i data-lucide="package-open" class="w-10 h-10 text-slate-400"></i>
+                </div>
+
+                <!-- VIEW: SETTINGS -->
+                <div id="view-settings" class="hidden fade-in space-y-6">
+                    <h1 class="text-3xl font-bold text-navy mb-6">Mínar stillingar</h1>
+                    <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm max-w-lg">
+                        <div class="mb-8">
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-3">Prófílmynd</label>
+                            <div class="flex items-center gap-6">
+                                <div class="relative group cursor-pointer">
+                                    <img id="settings-avatar" class="w-24 h-24 rounded-full object-cover bg-slate-100 border-4 border-slate-50 shadow-sm hidden" src="">
+                                    <div id="settings-avatar-placeholder" class="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center font-bold text-navy text-2xl border-4 border-white shadow-md">NN</div>
+                                    <div class="absolute inset-0 bg-black/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <lucide-icon name="camera" class="text-white w-6 h-6"></lucide-icon>
+                                    </div>
+                                    <input type="file" id="avatar-upload" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-navy">Hlaða upp mynd</p>
+                                    <p class="text-xs text-slate-500 mt-1">JPG eða PNG. Max 2MB.</p>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="text-lg font-bold text-navy mb-2">Engar vörur fundust</h3>
-                        <p class="text-slate-500 text-sm max-w-xs mx-auto">Hafðu samband við stjórnanda hópsins til að bæta við vörum.</p>
+                        <div class="mb-8">
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Fullt nafn</label>
+                            <input type="text" id="settings-name" class="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 font-medium text-navy focus:ring-2 focus:ring-highlight focus:border-highlight outline-none transition-all" placeholder="Nafnið þitt">
+                        </div>
+                        <button onclick="saveSettings()" class="w-full bg-navy text-white py-3.5 rounded-xl font-bold hover:bg-opacity-90 shadow-lg shadow-navy/20 transition-all">Vista breytingar</button>
                     </div>
                 </div>
 
@@ -260,238 +365,453 @@
         </div>
     </main>
 
-    <!-- MODAL: Advertisement Poster -->
-    <div id="poster-modal" class="modal-overlay fixed inset-0 items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden relative transform transition-all scale-100 max-h-[90vh] flex flex-col">
+    <!-- MODALS -->
+
+    <!-- 1. NO GROUP MODAL -->
+    <div id="modal-no-group" class="fixed inset-0 bg-white z-[80] hidden flex-col items-center justify-center p-6 text-center">
+        <div class="max-w-lg w-full animate-in fade-in zoom-in-95 duration-300">
+            <div class="w-20 h-20 bg-navy rounded-3xl flex items-center justify-center text-highlight font-bold text-4xl shadow-xl mx-auto mb-8">:)</div>
+            <h1 class="text-4xl font-bold text-navy mb-4">Velkomin í TEMPO</h1>
+            <p class="text-slate-500 mb-12 text-lg leading-relaxed">Þú þarft að velja hóp til að halda áfram. Ertu hópstjóri eða seljandi?</p>
             
-            <!-- Close Button (Red X) -->
-            <button onclick="closePosterModal()" class="absolute top-4 right-4 z-50 w-10 h-10 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-smooth hover:rotate-90">
-                <i data-lucide="x" class="w-6 h-6"></i>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button onclick="openGroupModal('create')" class="p-6 border border-slate-200 rounded-2xl hover:border-highlight hover:shadow-lg transition-all text-left bg-white group">
+                    <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-highlight group-hover:text-navy transition-colors">
+                        <lucide-icon name="plus" class="w-5 h-5"></lucide-icon>
+                    </div>
+                    <h3 class="font-bold text-navy text-lg">Stofna Hóp</h3>
+                    <p class="text-sm text-slate-400 mt-1">Fyrir hópstjóra</p>
+                </button>
+                <button onclick="openGroupModal('join')" class="p-6 border border-slate-200 rounded-2xl hover:border-highlight hover:shadow-xl transition-all text-left bg-white group">
+                     <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-highlight group-hover:text-navy transition-colors">
+                        <lucide-icon name="users" class="w-5 h-5"></lucide-icon>
+                    </div>
+                    <h3 class="font-bold text-navy text-lg">Ganga í Hóp</h3>
+                    <p class="text-sm text-slate-400 mt-1">Fyrir seljendur</p>
+                </button>
+            </div>
+            <button onclick="logout()" class="mt-12 text-slate-400 hover:text-red-500 text-sm font-bold flex items-center justify-center gap-2 mx-auto">
+                <lucide-icon name="log-out" class="w-4 h-4"></lucide-icon> Skrá mig út
             </button>
+        </div>
+    </div>
 
-            <div class="overflow-y-auto p-4 md:p-8 flex justify-center bg-slate-100">
-                <!-- The A4 Poster -->
-                <div id="poster-content" class="poster-wrapper shadow-2xl">
-                    
-                    <!-- Header -->
-                    <div class="poster-header">
-                        <div class="flex justify-center mb-4">
-                            <div class="w-14 h-14 bg-accent rounded-xl flex items-center justify-center text-navy font-bold text-2xl shadow-lg">
-                                <i data-lucide="zap"></i>
-                            </div>
-                        </div>
-                        <h1 class="text-3xl font-extrabold uppercase tracking-tight mb-1">Styrktu okkur!</h1>
-                        <p class="text-slate-200 text-sm font-medium uppercase tracking-widest">Söfnun fyrir 2. Flokk Stjörnunnar</p>
-                    </div>
-
-                    <!-- Body -->
-                    <div class="p-8 pt-12 flex-1 bg-white flex flex-col">
-                        
-                        <!-- Seller Info -->
-                        <div class="flex flex-col items-center -mt-20 mb-8 relative z-10">
-                            <div class="w-28 h-28 rounded-full border-4 border-white shadow-xl bg-slate-100 flex items-center justify-center overflow-hidden">
-                                <span class="text-2xl font-bold text-slate-400">BB</span>
-                                <!-- <img src="..." class="w-full h-full object-cover"> -->
-                            </div>
-                            <h2 class="text-2xl font-bold text-navy mt-3">Benedikt Björgvinsson</h2>
-                            <p class="text-slate-500 text-sm">er að safna fyrir ferðalaginu</p>
-                        </div>
-
-                        <!-- Products Grid (Visual) -->
-                        <div class="grid grid-cols-2 gap-4 mb-auto">
-                            <!-- Item 1 -->
-                            <div class="border border-slate-100 rounded-xl p-3 flex flex-col gap-2">
-                                <div class="h-24 bg-slate-50 rounded-lg w-full"></div>
-                                <div>
-                                    <p class="font-bold text-navy text-sm leading-tight">Lúxus Kerti</p>
-                                    <p class="text-accent font-bold text-sm">2.500 kr.</p>
-                                </div>
-                            </div>
-                            <!-- Item 2 -->
-                            <div class="border border-slate-100 rounded-xl p-3 flex flex-col gap-2">
-                                <div class="h-24 bg-slate-50 rounded-lg w-full"></div>
-                                <div>
-                                    <p class="font-bold text-navy text-sm leading-tight">Gæða Kaffi</p>
-                                    <p class="text-accent font-bold text-sm">2.900 kr.</p>
-                                </div>
-                            </div>
-                            <!-- Item 3 -->
-                            <div class="border border-slate-100 rounded-xl p-3 flex flex-col gap-2">
-                                <div class="h-24 bg-slate-50 rounded-lg w-full"></div>
-                                <div>
-                                    <p class="font-bold text-navy text-sm leading-tight">Ullarsokkar</p>
-                                    <p class="text-accent font-bold text-sm">3.500 kr.</p>
-                                </div>
-                            </div>
-                            <!-- Item 4 -->
-                            <div class="border border-slate-100 rounded-xl p-3 flex flex-col gap-2">
-                                <div class="h-24 bg-slate-50 rounded-lg w-full"></div>
-                                <div>
-                                    <p class="font-bold text-navy text-sm leading-tight">Lakkrís</p>
-                                    <p class="text-accent font-bold text-sm">1.500 kr.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Minimal Footer (No box) -->
-                        <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col items-center justify-center text-center gap-2">
-                            <div class="flex items-center gap-2 text-navy font-bold">
-                                <div class="w-6 h-6 bg-navy rounded-md flex items-center justify-center text-accent text-xs"><i data-lucide="zap"></i></div>
-                                <span>TEMPO</span>
-                            </div>
-                            <p class="text-[10px] text-slate-400 uppercase tracking-widest">Einföld fjáröflun</p>
-                        </div>
-
-                    </div>
+    <!-- 2. INPUT MODAL (Generic for Join/Create) -->
+    <div id="modal-input" class="modal-overlay items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full transform scale-100 transition-all">
+            <h3 class="text-2xl font-bold text-navy mb-6" id="modal-title">...</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Heiti hóps</label>
+                    <input type="text" id="input-1" class="w-full p-4 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-highlight font-medium text-navy" placeholder="...">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Lykilorð</label>
+                    <input type="text" id="input-2" class="w-full p-4 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-highlight font-medium text-navy" placeholder="...">
                 </div>
             </div>
-            
-            <div class="p-4 bg-white border-t border-slate-200 flex justify-between items-center">
-                <p class="text-xs text-slate-500">Sýnishorn (A4 Stærð)</p>
-                <button class="bg-navy text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-opacity-90 transition-smooth">Sækja PDF</button>
+            <div class="flex gap-3 mt-8">
+                <button onclick="closeModal()" class="flex-1 py-3 text-slate-500 font-bold hover:bg-slate-50 rounded-xl transition-colors">Hætta</button>
+                <button id="modal-action-btn" class="flex-1 py-3 bg-navy text-white rounded-xl font-bold hover:bg-opacity-90 shadow-lg shadow-navy/20 transition-all">Áfram</button>
             </div>
         </div>
     </div>
 
+    <!-- 3. POSTER MODAL (Fixed & X button) -->
+    <div id="modal-poster" class="modal-overlay items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full rounded-3xl shadow-2xl p-0 overflow-hidden my-8 relative transform transition-all" style="max-width: 210mm;">
+            
+            <!-- CLOSE BUTTON -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 z-50 bg-white p-2 rounded-full shadow-md text-slate-400 hover:text-white hover:bg-red-500 transition-all">
+                <lucide-icon name="x" class="w-6 h-6"></lucide-icon>
+            </button>
+            
+            <div class="poster-wrapper" id="poster-content">
+                <!-- Header -->
+                <div class="poster-header">
+                    <div class="flex justify-center mb-4">
+                         <div class="w-16 h-16 bg-highlight rounded-2xl flex items-center justify-center text-navy font-bold text-3xl shadow-lg">:)</div>
+                    </div>
+                    <h2 class="text-4xl font-extrabold tracking-tight uppercase mb-1">Styrktu okkur!</h2>
+                    <p class="text-blue-100 text-sm font-medium uppercase tracking-widest">Söfnun fyrir <span id="poster-group">...</span></p>
+                </div>
+
+                <div class="p-8 pt-14 bg-white flex flex-col flex-grow">
+                    <!-- Seller Info -->
+                    <div class="flex flex-col items-center -mt-28 mb-8 relative z-10">
+                        <img id="poster-avatar" src="" class="w-32 h-32 rounded-full border-8 border-white shadow-xl bg-slate-100 object-cover hidden">
+                        <div id="poster-initials" class="w-32 h-32 rounded-full border-8 border-white shadow-xl bg-slate-100 flex items-center justify-center text-4xl font-bold text-slate-400">?</div>
+                        
+                        <h3 class="text-2xl font-bold text-navy mt-4 text-center"><span id="poster-name">...</span></h3>
+                        <p class="text-slate-500 text-sm font-medium bg-slate-100 px-3 py-1 rounded-full mt-2">Söluaðili</p>
+                    </div>
+
+                    <!-- Grid -->
+                    <div class="poster-grid" id="poster-grid"></div>
+
+                    <!-- Footer -->
+                    <div class="mt-auto bg-slate-50 rounded-2xl p-6 border-2 border-dashed border-slate-200 text-center">
+                        <p class="text-navy font-bold text-lg">Pantaðu á: <span class="font-mono">tempo.is</span></p>
+                        <p class="text-xs text-slate-400 mt-1">Takk fyrir stuðninginn!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+                <p class="text-xs text-slate-400 font-medium">Taktu skjáskot af plakatinu til að deila.</p>
+                <button onclick="window.print()" class="bg-navy text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-opacity-90 transition-all flex items-center gap-2">
+                    <lucide-icon name="printer" class="w-4 h-4"></lucide-icon> Prenta / PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logic -->
     <script>
-        // Initialize Lucide Icons
         lucide.createIcons();
+        
+        const SUPABASE_URL = 'https://axwbfnnhbccoqtqaffaj.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4d2Jmbm5oYmNjb3F0cWFmZmFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NTMxOTksImV4cCI6MjA3OTIyOTE5OX0.xEHFqIe8QYT22Yj375LNYqwPkwJA5hrVB6HyPASNobs';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Dummy Data
-        const dummyProducts = [
-            { id: 1, name: 'Lúxus Kerti - Vanilla', price: '2.500 kr', sold: 12, img: '' },
-            { id: 2, name: 'Gæða Kaffi (500g)', price: '2.900 kr', sold: 8, img: '' },
-            { id: 3, name: 'Íslenskur Lakkrís', price: '1.500 kr', sold: 24, img: '' },
-            { id: 4, name: 'Ullarsokkar (2 pör)', price: '3.500 kr', sold: 5, img: '' },
-            { id: 5, name: 'Snyrtivörur', price: '4.900 kr', sold: 2, img: '' },
-            { id: 6, name: 'Súkkulaðirúsínur', price: '1.200 kr', sold: 15, img: '' }
+        const products = [
+            {id:1, name:"Lúxus Kerti", price:2500, img:"https://images.unsplash.com/photo-1602826665182-12628476a191?auto=format&fit=crop&w=400"},
+            {id:2, name:"Gæða Kaffi", price:2900, img:"https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=400"},
+            {id:3, name:"Lakkrís", price:1500, img:"https://images.unsplash.com/photo-1582128133989-27f2e9c5168d?auto=format&fit=crop&w=400"},
+            {id:4, name:"Ullarsokkar", price:3500, img:"https://images.unsplash.com/photo-1586236287184-7f6b53f6952b?auto=format&fit=crop&w=400"},
+            {id:5, name:"Snyrtivörur", price:4900, img:"https://images.unsplash.com/photo-1612817288484-6f916006741a?auto=format&fit=crop&w=400"},
+            {id:6, name:"Rúsínur", price:1200, img:"https://images.unsplash.com/photo-1548187680-42e719c27e30?auto=format&fit=crop&w=400"},
+            {id:7, name:"Piparkökur", price:2200, img:"https://images.unsplash.com/photo-1606312619070-d48b4c652a52?auto=format&fit=crop&w=400"},
+            {id:8, name:"Jólaskraut", price:3900, img:"https://images.unsplash.com/photo-1544143697-87f3befc7547?auto=format&fit=crop&w=400"},
+            {id:9, name:"Salernispappír", price:3200, img:"https://images.unsplash.com/photo-1584681479374-6d4240d8c00b?auto=format&fit=crop&w=400"}
         ];
 
-        const dummyOrders = [
-            { date: '21/11', buyer: 'Jón Jónsson', items: '3x Kerti, 1x Kaffi', amount: '10.400 kr', status: 'Greitt' },
-            { date: '20/11', buyer: 'Sigga', items: '2x Lakkrís', amount: '3.000 kr', status: 'Greitt' },
-            { date: '19/11', buyer: 'Gunnar', items: '1x Sokkar', amount: '3.500 kr', status: 'Í vinnslu' },
-            { date: '19/11', buyer: 'Anna', items: '5x Rúsínur', amount: '6.000 kr', status: 'Greitt' },
-        ];
+        let currentUser, currentGroup, sellerData, orders = [];
+        let selectedIds = new Set();
+        let salesChartInstance = null;
 
-        // Render Products
-        const productGrid = document.getElementById('product-grid');
-        if (dummyProducts.length > 0) {
-            productGrid.innerHTML = dummyProducts.map(p => `
-                <div class="product-card bg-white rounded-2xl p-4 cursor-pointer group">
-                    <div class="h-32 bg-slate-100 rounded-xl mb-3 relative overflow-hidden">
-                        <!-- Placeholder Img -->
-                        <div class="absolute inset-0 flex items-center justify-center text-slate-300">
-                            <i data-lucide="image" class="w-8 h-8"></i>
-                        </div>
-                        <div class="check-icon absolute top-2 right-2 w-8 h-8 bg-accent text-navy rounded-full flex items-center justify-center shadow-sm">
-                            <i data-lucide="check" class="w-4 h-4"></i>
+        async function init() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if(!session) return window.location.href = 'login.html';
+            
+            currentUser = session.user;
+            const meta = currentUser.user_metadata || {};
+            
+            // Load Data
+            await Promise.all([fetchSeller(), fetchOrders()]);
+
+            // Hide Loading
+            document.getElementById('loading-screen').style.display = 'none';
+            
+            if(!meta.group_id) {
+                document.getElementById('modal-no-group').style.display = 'flex';
+            } else {
+                currentGroup = { id: meta.group_id, name: meta.group_name };
+                setupDashboard(meta);
+            }
+        }
+
+        async function fetchSeller() {
+            const { data } = await supabaseClient.from('sellers').select('*').eq('user_id', currentUser.id).single();
+            if(data) {
+                sellerData = data;
+                if(data.selected_products) selectedIds = new Set(data.selected_products.map(p=>p.id));
+            }
+        }
+
+        async function fetchOrders() {
+            const { data } = await supabaseClient.from('orders').select('*').eq('seller_id', currentUser.id).order('created_at', {ascending:false});
+            if(data) orders = data;
+        }
+
+        // --- SETUP UI ---
+        function setupDashboard(meta) {
+            const name = sellerData?.full_name || meta.full_name || 'Notandi';
+            const avatar = sellerData?.avatar_url;
+            const initials = name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+
+            // Fill Name & Group
+            ['header-name', 'settings-name'].forEach(id => {
+                const el = document.getElementById(id); 
+                if(el) el.tagName === 'INPUT' ? el.value = name : el.innerText = name;
+            });
+            document.getElementById('header-group').innerText = meta.group_name;
+            document.getElementById('sidebar-name').innerText = name;
+            document.getElementById('sidebar-group').innerText = meta.group_name;
+            
+            // Handle Avatar vs Initials
+            const setAvatar = (src) => {
+                [document.getElementById('header-avatar'), document.getElementById('settings-avatar'), document.getElementById('sidebar-avatar')].forEach(el => {
+                    el.src = src; el.classList.remove('hidden');
+                });
+                [document.getElementById('header-initials'), document.getElementById('settings-avatar-placeholder'), document.getElementById('sidebar-initials')].forEach(el => el.classList.add('hidden'));
+            }
+            
+            if(avatar) setAvatar(avatar);
+            else {
+                document.getElementById('header-initials').innerText = initials;
+                document.getElementById('settings-avatar-placeholder').innerText = initials;
+                document.getElementById('sidebar-initials').innerText = initials;
+            }
+
+            // Generate Personal Sales Link
+            const link = `${window.location.origin}/sale.html?group=${meta.group_id}&seller=${currentUser.id}`;
+            document.getElementById('personal-link').innerText = link;
+
+            // Show Admin Link if Admin
+            if(meta.role === 'admin') document.getElementById('nav-admin').classList.remove('hidden');
+
+            renderStats();
+            renderProducts();
+            renderOrders();
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function renderStats() {
+            const total = orders.reduce((sum, o) => sum + o.total_sales, 0);
+            const count = orders.length;
+            const avg = count ? Math.round(total/count) : 0;
+
+            document.getElementById('stat-sales').innerText = total.toLocaleString('is-IS');
+            document.getElementById('stat-orders').innerText = count;
+            document.getElementById('stat-avg').innerText = avg.toLocaleString('is-IS');
+
+            // Render Chart
+            const ctx = document.getElementById('salesChart');
+            const emptyMsg = document.getElementById('empty-chart-msg');
+            
+            if(orders.length > 0) {
+                emptyMsg.classList.add('hidden');
+                const productCounts = {};
+                orders.forEach(o => o.items.forEach(i => productCounts[i.name] = (productCounts[i.name] || 0) + i.qty));
+                
+                if(salesChartInstance) salesChartInstance.destroy();
+
+                salesChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(productCounts),
+                        datasets: [{
+                            label: 'Seld magn',
+                            data: Object.values(productCounts),
+                            backgroundColor: '#0A1C2E',
+                            borderRadius: 6,
+                            barThickness: 20
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { 
+                            y: { beginAtZero: true, grid: { display: false } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            } else {
+                emptyMsg.classList.remove('hidden');
+            }
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = products.map(p => {
+                const isSel = selectedIds.has(p.id);
+                return `<div onclick="toggleProd(${p.id})" class="product-card bg-white rounded-2xl p-4 cursor-pointer group ${isSel ? 'selected' : ''}">
+                    <div class="h-40 bg-slate-100 rounded-xl mb-3 overflow-hidden relative">
+                        <img src="${p.img}" class="w-full h-full object-cover">
+                        <div class="check-icon absolute top-2 right-2 w-8 h-8 bg-highlight text-navy rounded-full flex items-center justify-center opacity-0 transition-all shadow-sm"><lucide-icon name="check" class="w-5 h-5"></lucide-icon></div>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-navy">${p.name}</h4>
+                            <p class="text-slate-500 text-sm">${p.price.toLocaleString()} kr</p>
                         </div>
                     </div>
-                    <h4 class="font-bold text-navy mb-1">${p.name}</h4>
-                    <div class="flex justify-between items-center">
-                        <p class="text-slate-500 text-sm">${p.price}</p>
-                        <span class="text-[10px] font-bold bg-green-50 text-green-700 px-2 py-1 rounded-full">Selt: ${p.sold}</span>
+                </div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function toggleProd(id) {
+            if(selectedIds.has(id)) selectedIds.delete(id); else selectedIds.add(id);
+            renderProducts();
+        }
+
+        function renderOrders() {
+            const makeRows = (list) => list.map(o => {
+                // Create detailed string e.g. "2x Kerti, 1x Kaffi"
+                const itemsStr = o.items.map(i => `<span class="font-bold text-navy">${i.qty}x</span> ${i.name}`).join(', ');
+                const status = o.status === 'Greitt' ? 
+                    `<span class="bg-green-100 text-green-700 px-2 py-1 rounded-md text-xs font-bold">Greitt</span>` : 
+                    `<span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-md text-xs font-bold">Í vinnslu</span>`;
+
+                return `<tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 text-slate-500 text-xs">${new Date(o.created_at).toLocaleDateString('is-IS')}</td>
+                    <td class="px-6 py-4 font-bold text-navy">${o.buyer_name}</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">${itemsStr}</td>
+                    <td class="px-6 py-4 text-right font-mono font-bold">${o.total_sales.toLocaleString()} kr</td>
+                    <td class="px-6 py-4 text-right">${status}</td>
+                </tr>`;
+            }).join('');
+
+            const rows = orders.length ? makeRows(orders) : `<tr><td colspan="5" class="text-center py-12 text-slate-400">Engar pantanir fundust.</td></tr>`;
+            
+            document.getElementById('recent-orders-body').innerHTML = rows;
+            document.getElementById('full-orders-body').innerHTML = rows;
+        }
+
+        // --- ACTIONS ---
+
+        async function saveSelection() {
+            const selected = products.filter(p => selectedIds.has(p.id));
+            await supabaseClient.from('sellers').upsert({ user_id: currentUser.id, selected_products: selected });
+            alert("Vöruval vistað!");
+            switchView('overview');
+        }
+
+        async function saveSettings() {
+            const name = document.getElementById('settings-name').value;
+            const file = document.getElementById('avatar-upload').files[0];
+            let avatarUrl = sellerData?.avatar_url;
+
+            if(file) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                await new Promise(resolve => reader.onload = () => { avatarUrl = reader.result; resolve(); });
+            }
+
+            // Save to auth and DB
+            await supabaseClient.auth.updateUser({ data: { full_name: name } });
+            await supabaseClient.from('sellers').upsert({ 
+                user_id: currentUser.id, 
+                full_name: name, 
+                avatar_url: avatarUrl,
+                selected_products: products.filter(p => selectedIds.has(p.id)) // Keep products
+            });
+            
+            location.reload(); // Reload to see changes
+        }
+
+        function openPosterModal() {
+            if(selectedIds.size === 0) return alert("Veldu vörur fyrst!");
+            
+            document.getElementById('poster-name').innerText = document.getElementById('header-name').innerText;
+            document.getElementById('poster-group').innerText = document.getElementById('header-group').innerText;
+            
+            // Avatar on Poster
+            const avatarSrc = document.getElementById('header-avatar').src || document.getElementById('sidebar-avatar').src;
+            if(avatarSrc) document.getElementById('poster-avatar').src = avatarSrc;
+
+            const grid = document.getElementById('poster-grid');
+            const selected = products.filter(p => selectedIds.has(p.id));
+            
+            // Auto size logic
+            const isMany = selected.length > 4;
+            document.querySelector('.poster-wrapper').className = `poster-wrapper ${isMany ? 'many-items' : ''}`;
+            
+            grid.innerHTML = selected.map(p => `
+                <div class="border border-slate-200 rounded-xl overflow-hidden flex flex-col h-full bg-white">
+                    <div class="poster-item-img h-32 bg-slate-100 relative shrink-0">
+                        <img src="${p.img}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-3 flex flex-col flex-grow justify-between bg-slate-50/30">
+                        <p class="font-bold text-navy text-sm leading-tight mb-1">${p.name}</p>
+                        <p class="text-highlight font-bold text-sm">${p.price.toLocaleString()} kr</p>
                     </div>
                 </div>
             `).join('');
-            // Re-init icons for injected HTML
-            lucide.createIcons();
-        } else {
-            // Empty state
-            document.getElementById('empty-products').classList.remove('hidden');
+
+            document.getElementById('modal-poster').classList.add('active');
         }
 
-        // Render Recent Orders
-        const ordersList = document.getElementById('recent-orders-list');
-        ordersList.innerHTML = dummyOrders.map(o => `
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center text-sm">
-                <div>
-                    <p class="font-bold text-navy">${o.buyer}</p>
-                    <p class="text-xs text-slate-500">${o.items}</p>
-                </div>
-                <div class="text-right">
-                    <p class="font-mono font-bold text-navy">${o.amount}</p>
-                    <p class="text-[10px] font-bold uppercase ${o.status === 'Greitt' ? 'text-green-600' : 'text-yellow-600'}">${o.status}</p>
-                </div>
-            </div>
-        `).join('');
-
-        // Chart.js Setup
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Mán', 'Þri', 'Mið', 'Fim', 'Fös', 'Lau', 'Sun'],
-                datasets: [{
-                    label: 'Sala (kr.)',
-                    data: [12000, 19000, 3000, 5000, 22000, 35000, 41000],
-                    borderColor: '#0A1C2E',
-                    backgroundColor: 'rgba(10, 28, 46, 0.05)',
-                    borderWidth: 3,
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: '#FACC15',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#E2E8F0' }, ticks: { font: { family: "'Plus Jakarta Sans', sans-serif" } } },
-                    x: { grid: { display: false }, ticks: { font: { family: "'Plus Jakarta Sans', sans-serif" } } }
-                }
-            }
-        });
-
-        // Toggle functionality for product selection
-        document.querySelectorAll('.product-card').forEach(card => {
-            card.addEventListener('click', function() {
-                this.classList.toggle('selected');
+        // Navigation & Utils
+        function switchView(view) {
+            ['overview', 'products', 'orders', 'settings'].forEach(id => {
+                document.getElementById(`view-${id}`)?.classList.add('hidden');
+                document.getElementById(`nav-${id}`)?.classList.remove('active', 'bg-highlight', 'text-navy');
             });
-        });
-
-        // Poster Modal Logic
-        function openPosterModal() {
-            const modal = document.getElementById('poster-modal');
-            modal.classList.add('active');
-            modal.querySelector('div').classList.add('modal-enter');
-        }
-
-        function closePosterModal() {
-            const modal = document.getElementById('poster-modal');
-            const content = modal.querySelector('div');
-            content.classList.remove('modal-enter');
-            content.classList.add('modal-exit');
+            const target = document.getElementById(`view-${view}`);
+            if(target) target.classList.remove('hidden');
+            const btn = document.getElementById(`nav-${view}`);
+            if(btn) btn.classList.add('active');
             
-            setTimeout(() => {
-                modal.classList.remove('active');
-                content.classList.remove('modal-exit');
-            }, 200);
+            const titles = { overview: 'Minn Prófíll', products: 'Vöruúrval', orders: 'Pantanir', settings: 'Stillingar' };
+            document.getElementById('page-title').innerText = titles[view];
         }
 
+        function closeModal() { document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active')); }
+        
         function copyLink() {
-            navigator.clipboard.writeText(document.getElementById('sales-link-text').innerText);
-            alert("Hlekkur afritaður!");
+            const text = document.getElementById('personal-link').innerText;
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try { document.execCommand('copy'); alert("Hlekkur afritaður!"); } catch (err) { prompt("Afritaðu hlekkinn:", text); }
+            document.body.removeChild(textarea);
         }
 
-        function leaveGroup() {
-            if(confirm("Ertu viss um að þú viljir skrá þig úr hópnum?")) {
-                // Logic to leave group
-                alert("Þú hefur yfirgefið hópinn.");
-                window.location.reload(); 
+        async function logout() { await supabaseClient.auth.signOut(); location.href = 'index.html'; }
+        
+        // Group Logic
+        function openGroupModal(type) {
+            document.getElementById('modal-no-group').style.display = 'none';
+            document.getElementById('modal-input').classList.add('active');
+            
+            const title = document.getElementById('modal-title');
+            const btn = document.getElementById('modal-action-btn');
+            const in1 = document.getElementById('input-1');
+            const in2 = document.getElementById('input-2');
+
+            if(type === 'create') {
+                title.innerText = "Stofna Hóp";
+                in1.placeholder = "Nafn hóps";
+                in2.placeholder = "Lykilorð (fyrir aðra)";
+                btn.innerText = "Stofna";
+                btn.onclick = async () => {
+                    const { data } = await supabaseClient.from('groups').insert([{ group_name: in1.value, group_password: in2.value, admin_id: currentUser.id }]).select().single();
+                    await supabaseClient.auth.updateUser({ data: { group_id: data.group_id, group_name: in1.value, role: 'admin', group_password: in2.value } });
+                    location.reload();
+                };
+            } else {
+                title.innerText = "Ganga í Hóp";
+                in1.placeholder = "Nafn hóps";
+                in2.placeholder = "Lykilorð";
+                btn.innerText = "Ganga í";
+                btn.onclick = async () => {
+                    const { data } = await supabaseClient.from('groups').select('*').eq('group_name', in1.value).single();
+                    if(data && data.group_password === in2.value) {
+                        await supabaseClient.auth.updateUser({ data: { group_id: data.group_id, group_name: data.group_name, role: 'member' } });
+                        location.reload();
+                    } else alert("Rangt nafn eða lykilorð");
+                };
             }
         }
-        
-        function logout() {
-             // Logout logic
-             window.location.href = 'index.html';
+
+        async function leaveGroup() {
+            if(confirm("Yfirgefa hóp?")) {
+                await supabaseClient.auth.updateUser({ data: { group_id: null, group_name: null, role: null } });
+                location.reload();
+            }
         }
 
+        document.getElementById('avatar-upload').addEventListener('change', function(e) {
+            if(this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.getElementById('settings-avatar');
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                    document.getElementById('settings-avatar-placeholder').classList.add('hidden');
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        init();
     </script>
 </body>
 </html>
